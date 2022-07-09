@@ -8,12 +8,14 @@ import urllib.request, json
 # http://getskeleton.com/
 # https://opentdb.com/api_config.php
 
+
 def genKey():
     """
     This function Generates a random value to be used as the key for a test access code
     :return:
     """
-    return random.randint(1,2000000)
+    return random.randint(1, 2000000)
+
 
 def getQuestions(qty):
     baseUrl = "https://opentdb.com/api.php?amount=10"
@@ -96,7 +98,7 @@ def create():
 
     if request.method == "POST":
         question_id = request.form["question_id"]
-        question_text = request.form["question"]
+        question_text = request.form["question_text"]
         answer = request.form["answer"]
         question = QuestionModel(
             question_id=question_id, question_text=question_text, answer=answer
@@ -159,6 +161,5 @@ def delete(id):
 
 if __name__ == "__main__":
 
-    app.directory = './'
-    app.run(host='127.0.0.1', port=5000)
-
+    app.directory = "./"
+    app.run(host="127.0.0.1", port=5000, debug=True)
