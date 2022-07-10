@@ -1,4 +1,4 @@
-from models import db, QuestionModel
+from models import db, QuestionModel, AnswerModel
 from flask import Flask, render_template, request, redirect
 import os
 import random
@@ -25,6 +25,10 @@ def getQuestions(qty):
         print(data)
 
 
+def get_question(id):
+    return QuestionModel.query.filter_by(question_id=id).first()
+
+
 print(f"Current Working Directory = {os.getcwd()}")
 os.chdir(".")
 print(os.getcwd())
@@ -36,6 +40,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
 
+# CREATE IF NOT EXISTS
 @app.before_first_request
 def create_table():
     db.create_all()
@@ -90,7 +95,7 @@ def index5():
     return render_template("homie2.html", greetings=greetings, detail=detail)
 
 
-# CREATE VIEW
+# CREATE VIEW -- TO REMOVE for FINAL submission -- (for testing only)
 @app.route("/questions/create", methods=["GET", "POST"])
 def create():
     if request.method == "GET":
@@ -118,7 +123,7 @@ def RetrieveQuestionsList():
 # RETRIEVE SINGLE QUESTION
 @app.route("/questions/<int:id>")
 def RetrieveSingleQuestion(id):
-    question = QuestionModel.query.filter_by(question_id=id).first()
+    question = get_question(id)
     if question:
         return render_template("questions.html", question=question)
     return f"Question with id = {id} Doesn't exist"
@@ -157,6 +162,29 @@ def delete(id):
             return redirect("/questions")
         abort(404)
     return render_template("delete.html")
+
+
+@app.route("/answerquestion/<int:candidate_id>/<int:id>", methods=["GET", "POST"])
+def answer_question(candidate_id, id):
+    # USER ASKED QUESTION
+    question = get_question(id)
+    if request.method == "GET":
+        if question:
+            return render_template("user_answer.html", question=question)
+        return f"No question exist for question {id}"
+    # USER ANSWERS QUESTION
+    id += 1
+    if question.answer == request.form["answer"]:
+        correct = True
+    else:
+        correct = False
+    question_id = question.question_id
+    candidate_id = candidate_id
+    answer = question.answer
+    graded_answer = AnswerModel(question_id, candidate_id, answer, correct)
+    db.session.add(graded_answer)
+    db.session.commit()
+    return redirect(f"/answerquestion/{candidate_id}/{id}")
 
 
 if __name__ == "__main__":
