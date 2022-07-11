@@ -127,6 +127,13 @@
 }
 
 @media screen and (max-width: 600px) {
+
+/*images */
+    .responsive {
+  width: 100%;
+  height: auto;
+}
+
   .topnav.responsive {
     position: relative;
   }
