@@ -55,7 +55,10 @@ def index():
     ccValue = "349950727078541"
     test2 = genKey()
     test3 = genKey()
-    return render_template("home.html", greetings=greetings, dobie=test2, dibs=test3)
+    sketch = 'static/images/Synergy_Simulator.png'
+    sketch2 = 'static/images/hand.jpg'
+    return render_template("home.html", greetings=greetings, dobie=test2,
+                           dibs=test3, image2=sketch, image3=sketch2)
 
 
 @app.route("/about")
@@ -64,8 +67,10 @@ def index2():
     This app is expressly for the purpose of getting an A
     in our Capstone Project"""
     detail = " Please Vote with your usage.... the more hits the better...."
+    sketch = 'static/images/brooke-cagle-g1Kr4Ozfoac-unsplash.jpg'
 
-    return render_template("homie2.html", greetings=greetings, detail=detail)
+    return render_template("homie2.html", greetings=greetings, detail=detail,
+                           image=sketch)
 
 
 @app.route("/help")
@@ -73,8 +78,10 @@ def index3():
     greetings = """...HELP, HELP, HELP..."""
 
     detail = "All the help you will ever need"
+    sketch = 'static/images/lasse-jensen-mPr2sCjuKAo-unsplash.jpg'
 
-    return render_template("homie2.html", greetings=greetings, detail=detail)
+    return render_template("homie2.html", greetings=greetings, detail=detail,
+                           image=sketch)
 
 
 @app.route("/contact")
