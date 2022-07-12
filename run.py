@@ -239,11 +239,13 @@ def answer_question(candidate_id, id):
                 return render_template("user_answer_free_form.html", question=question)
             # return f"No question exists for question {id}"
         # USER ANSWERS QUESTION
-        id += 1
-        if question.question_label == checks:
-            user_checks = request.form["answer"]
-            print(question.answer)
-            print(user_checks)
+        # id += 1
+        if question.question_label == checks:  # not picking up second item
+            user_checks = request.form.getlist("answer")  # string, e.g., "Cookies,Pies"
+            # print(question.answer)
+            # print(question.answer.split())
+            print(request.form)
+
             if question.answer == user_checks:
                 correct = True
             else:
@@ -260,6 +262,7 @@ def answer_question(candidate_id, id):
         graded_answer = AnswerModel(
             question_id, candidate_id, question_label, answer, correct
         )
+        print(correct)
         db.session.add(graded_answer)
         db.session.commit()
         return redirect(f"/answerquestion/{candidate_id}/{id}")
