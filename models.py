@@ -12,15 +12,17 @@ class QuestionModel(db.Model):
     question_label = db.Column(db.String())
     question_text = db.Column(db.String())
     answer = db.Column(db.String())
+    options = db.Column(db.String())
 
-    def __init__(self, question_id, question_label, question_text, answer):
+    def __init__(self, question_id, question_label, question_text, answer, options):
         self.question_id = question_id
         self.question_label = question_label
         self.question_text = question_text
         self.answer = answer
+        self.options = options
 
     def __repr__(self):
-        return f"{self.question_text}:{self.question_id}"
+        return f"{self.question_text}:{self.question_id}:{self.answer}:{self.options}"
 
 
 class AnswerModel(db.Model):

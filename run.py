@@ -123,21 +123,24 @@ def create():
         question_label = request.form["question_label"]
         question_text = request.form["question_text"]
         answer = request.form["answer"]
+        options = request.form["options"]
         if question_label == checks:
-            answer = answer.split()
-            for answer in answer:
-                question = QuestionModel(
-                    question_id=question_id,
-                    question_label=question_label,
-                    question_text=question_text,
-                    answer=answer,
-                )
-        question = QuestionModel(
-            question_id=question_id,
-            question_label=question_label,
-            question_text=question_text,
-            answer=answer,
-        )
+
+            question = QuestionModel(
+                question_id=question_id,
+                question_label=question_label,
+                question_text=question_text,
+                answer=answer,
+                options=options,
+            )
+        else:
+            question = QuestionModel(
+                question_id=question_id,
+                question_label=question_label,
+                question_text=question_text,
+                answer=answer,
+                options=options,
+            )
         db.session.add(question)
         db.session.commit()
         return redirect("/questions")
@@ -234,7 +237,10 @@ def answer_question(candidate_id, id):
         free_form = "Input answer in text box:"
         if request.method == "GET":
             if question.question_label == checks:
-                return render_template("user_answer_check.html", question=question)
+                options = question.options.split(",")
+                return render_template(
+                    "user_answer_check.html", question=question, options=options
+                )
             elif question.question_label == free_form:
                 return render_template("user_answer_free_form.html", question=question)
             # return f"No question exists for question {id}"
@@ -242,8 +248,9 @@ def answer_question(candidate_id, id):
         # id += 1
         if question.question_label == checks:  # not picking up second item
             user_checks = request.form.getlist("answer")  # string, e.g., "Cookies,Pies"
-            # print(question.answer)
-            # print(question.answer.split())
+            print(user_checks)
+            print(question.answer)
+            print(QuestionModel.query.filter_by(question_id=id).first())
             print(request.form)
 
             if question.answer == user_checks:

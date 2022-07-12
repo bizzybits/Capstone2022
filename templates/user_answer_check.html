@@ -1,23 +1,20 @@
 <form action='' method="POST">
     <p>{{question.question_id}}</p>
     <p>{{question.question_text}}</p>
+
+
+    {% for option in options %}
+    <h3>{{option}}</h3>
+    <hr>
     <div>
-        <input type="checkbox" name="answer" id="answer_foods" value="Cookies"> <label
-            for="answer_foods">Cookies</label>
+        <input type="checkbox" name="answer" id="answer_foods" value={{option}}> <label
+            for="answer_foods">{{option}}</label>
     </div>
-    <div>
-        <input type="checkbox" name="answer" id="answer_foods" value="Doughnuts"> <label
-            for="answer_foods">Doughnuts</label>
-    </div>
-    <div>
-        <input type="checkbox" name="answer" id="answer_foods" value="Pies"> <label for="answer_foods">Pies</label>
-    </div>
-    <div>
-        <input type="checkbox" name="answer" id="answer_foods" value="rugulach"> <label
-            for="answer_foods">Rugulach</label>
-    </div>
-    <p></p>
+    {% endfor %}
+
     <div>
         <input type="submit" name="submit" value="Submit" />
     </div>
+    <p></p>
+    <p></p>
 </form>
