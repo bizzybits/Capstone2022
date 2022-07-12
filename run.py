@@ -245,13 +245,15 @@ def answer_question(candidate_id, id):
                 return render_template("user_answer_free_form.html", question=question)
             # return f"No question exists for question {id}"
         # USER ANSWERS QUESTION
-        # id += 1
+        id += 1
         if question.question_label == checks:  # not picking up second item
             user_checks = request.form.getlist("answer")  # string, e.g., "Cookies,Pies"
-            print(user_checks)
-            print(question.answer)
-            print(QuestionModel.query.filter_by(question_id=id).first())
-            print(request.form)
+            # print(user_checks)
+            user_checks = ",".join(user_checks)
+            # print(user_checks)
+            # print(question.answer)
+            # print(QuestionModel.query.filter_by(question_id=id).first())
+            # print(request.form)
 
             if question.answer == user_checks:
                 correct = True
