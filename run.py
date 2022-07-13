@@ -49,21 +49,24 @@ def create_table():
 @app.route("/")
 def index():
     greetings = """QUIZLET from OSU...
-    This app is expressly for the purpose of getting an A
-    in our Capstone Project"""
+    This app is expressly for the testing employment candidates."""
+    greetings2 = "I am a..."
     test2 = "way too much fun....."
     ccValue = "349950727078541"
     test2 = genKey()
     test3 = genKey()
     sketch = "static/images/Synergy_Simulator.png"
-    sketch2 = "static/images/hand.jpg"
+    sketch2 = "static/images/plane.jpg"
+    authors = "© 2022 Elizabeth Ponce & Andrea Hamilton, All rights reserved"
     return render_template(
         "home.html",
         greetings=greetings,
+        greetings2=greetings2,
         dobie=test2,
         dibs=test3,
         image2=sketch,
         image3=sketch2,
+        authors=authors
     )
 
 
@@ -281,4 +284,4 @@ def answer_question(candidate_id, id):
 if __name__ == "__main__":
 
     app.directory = "./"
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    app.run(host="127.0.0.1", port=5020, debug=True)
