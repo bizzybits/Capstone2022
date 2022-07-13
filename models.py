@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 
+
 db = SQLAlchemy()
 
 
@@ -8,16 +9,20 @@ class QuestionModel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     question_id = db.Column(db.Integer(), unique=True)
+    question_label = db.Column(db.String())
     question_text = db.Column(db.String())
     answer = db.Column(db.String())
+    options = db.Column(db.String())
 
-    def __init__(self, question_id, question_text, answer):
+    def __init__(self, question_id, question_label, question_text, answer, options):
         self.question_id = question_id
+        self.question_label = question_label
         self.question_text = question_text
         self.answer = answer
+        self.options = options
 
     def __repr__(self):
-        return f"{self.question_text}:{self.question_id}"
+        return f"{self.question_text}:{self.question_id}:{self.answer}:{self.options}"
 
 
 class AnswerModel(db.Model):
@@ -26,12 +31,14 @@ class AnswerModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     question_id = db.Column(db.Integer())
     candidate_id = db.Column(db.Integer())
+    question_label = db.Column(db.String())
     answer = db.Column(db.String())
     correct = db.Column(db.Boolean())
 
-    def __init__(self, question_id, candidate_id, answer, correct):
+    def __init__(self, question_id, candidate_id, question_label, answer, correct):
         self.question_id = question_id
         self.candidate_id = candidate_id
+        self.question_label = question_label
         self.answer = answer
         self.correct = correct
 

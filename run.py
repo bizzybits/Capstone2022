@@ -55,10 +55,16 @@ def index():
     ccValue = "349950727078541"
     test2 = genKey()
     test3 = genKey()
-    sketch = 'static/images/Synergy_Simulator.png'
-    sketch2 = 'static/images/hand.jpg'
-    return render_template("home.html", greetings=greetings, dobie=test2,
-                           dibs=test3, image2=sketch, image3=sketch2)
+    sketch = "static/images/Synergy_Simulator.png"
+    sketch2 = "static/images/hand.jpg"
+    return render_template(
+        "home.html",
+        greetings=greetings,
+        dobie=test2,
+        dibs=test3,
+        image2=sketch,
+        image3=sketch2,
+    )
 
 
 @app.route("/about")
@@ -67,10 +73,11 @@ def index2():
     This app is expressly for the purpose of getting an A
     in our Capstone Project"""
     detail = " Please Vote with your usage.... the more hits the better...."
-    sketch = 'static/images/brooke-cagle-g1Kr4Ozfoac-unsplash.jpg'
+    sketch = "static/images/brooke-cagle-g1Kr4Ozfoac-unsplash.jpg"
 
-    return render_template("homie2.html", greetings=greetings, detail=detail,
-                           image=sketch)
+    return render_template(
+        "homie2.html", greetings=greetings, detail=detail, image=sketch
+    )
 
 
 @app.route("/help")
@@ -78,10 +85,11 @@ def index3():
     greetings = """...HELP, HELP, HELP..."""
 
     detail = "All the help you will ever need"
-    sketch = 'static/images/lasse-jensen-mPr2sCjuKAo-unsplash.jpg'
+    sketch = "static/images/lasse-jensen-mPr2sCjuKAo-unsplash.jpg"
 
-    return render_template("homie2.html", greetings=greetings, detail=detail,
-                           image=sketch)
+    return render_template(
+        "homie2.html", greetings=greetings, detail=detail, image=sketch
+    )
 
 
 @app.route("/contact")
@@ -109,12 +117,30 @@ def create():
         return render_template("createquestion.html")
 
     if request.method == "POST":
+        checks = "Check all that apply:"
+        free_form = "Input answer in text box:"
         question_id = request.form["question_id"]
+        question_label = request.form["question_label"]
         question_text = request.form["question_text"]
         answer = request.form["answer"]
-        question = QuestionModel(
-            question_id=question_id, question_text=question_text, answer=answer
-        )
+        options = request.form["options"]
+        if question_label == checks:
+
+            question = QuestionModel(
+                question_id=question_id,
+                question_label=question_label,
+                question_text=question_text,
+                answer=answer,
+                options=options,
+            )
+        else:
+            question = QuestionModel(
+                question_id=question_id,
+                question_label=question_label,
+                question_text=question_text,
+                answer=answer,
+                options=options,
+            )
         db.session.add(question)
         db.session.commit()
         return redirect("/questions")
@@ -125,6 +151,13 @@ def create():
 def RetrieveQuestionsList():
     questions = QuestionModel.query.all()
     return render_template("questionslist.html", questions=questions)
+
+
+# RETRIEVE LIST OF CANDIDATES -- TO DO
+@app.route("/candidates")
+def RetrieveCandidatesList():
+    candidates = AnswerModel.query.all()
+    return render_template("candidates.html", candidates=candidates)
 
 
 # RETRIEVE SINGLE QUESTION
@@ -144,11 +177,14 @@ def update(id):
         if question:
             db.session.delete(question)
             db.session.commit()
-
+            question_label = request.form["question_label"]
             question_text = request.form["question_text"]
             answer = request.form["answer"]
             question = QuestionModel(
-                question_id=id, question_text=question_text, answer=answer
+                question_id=id,
+                question_label=question_label,
+                question_text=question_text,
+                answer=answer,
             )
 
             db.session.add(question)
@@ -160,7 +196,7 @@ def update(id):
 
 # DELETE QUESTION
 @app.route("/questions/<int:id>/delete", methods=["GET", "POST"])
-def delete(id):
+def delete_question(id):
     question = QuestionModel.query.filter_by(question_id=id).first()
     if request.method == "POST":
         if question:
@@ -171,27 +207,75 @@ def delete(id):
     return render_template("delete.html")
 
 
+# DELETE CANDIDATE -- TO DO
+@app.route("/candidates/<int:id>/delete", methods=["GET", "POST"])
+def delete_candidate(id):
+    question = AnswerModel.query.filter_by(candidate_id=id).first()
+    if request.method == "POST":
+        if question:
+            db.session.delete(question)
+            db.session.commit()
+            return redirect("/candidates")
+        abort(404)
+    return render_template("delete.html")
+
+
 @app.route("/answerquestion/<int:candidate_id>/<int:id>", methods=["GET", "POST"])
 def answer_question(candidate_id, id):
     # USER ASKED QUESTION
     question = get_question(id)
-    if request.method == "GET":
-        if question:
-            return render_template("user_answer.html", question=question)
-        return f"No question exist for question {id}"
-    # USER ANSWERS QUESTION
-    id += 1
-    if question.answer == request.form["answer"]:
-        correct = True
-    else:
-        correct = False
-    question_id = question.question_id
-    candidate_id = candidate_id
-    answer = question.answer
-    graded_answer = AnswerModel(question_id, candidate_id, answer, correct)
-    db.session.add(graded_answer)
-    db.session.commit()
-    return redirect(f"/answerquestion/{candidate_id}/{id}")
+    while question is not None:
+        # If question is a free form
+        # render this template
+        # if quetions is some other form
+        # render other template
+        # if question is this kind
+        # render other
+        # if other kind
+        # render this
+        checks = "Check all that apply:"
+        free_form = "Input answer in text box:"
+        if request.method == "GET":
+            if question.question_label == checks:
+                options = question.options.split(",")
+                return render_template(
+                    "user_answer_check.html", question=question, options=options
+                )
+            elif question.question_label == free_form:
+                return render_template("user_answer_free_form.html", question=question)
+            # return f"No question exists for question {id}"
+        # USER ANSWERS QUESTION
+        id += 1
+        if question.question_label == checks:  # not picking up second item
+            user_checks = request.form.getlist("answer")  # string, e.g., "Cookies,Pies"
+            # print(user_checks)
+            user_checks = ",".join(user_checks)
+            # print(user_checks)
+            # print(question.answer)
+            # print(QuestionModel.query.filter_by(question_id=id).first())
+            # print(request.form)
+
+            if question.answer == user_checks:
+                correct = True
+            else:
+                correct = False
+        elif question.question_label == free_form:
+            if question.answer == request.form["answer"]:
+                correct = True
+            else:
+                correct = False
+        question_id = question.question_id
+        question_label = question.question_label
+        candidate_id = candidate_id
+        answer = question.answer
+        graded_answer = AnswerModel(
+            question_id, candidate_id, question_label, answer, correct
+        )
+        print(correct)
+        db.session.add(graded_answer)
+        db.session.commit()
+        return redirect(f"/answerquestion/{candidate_id}/{id}")
+    return f"No question exists for question {id}"
 
 
 if __name__ == "__main__":
