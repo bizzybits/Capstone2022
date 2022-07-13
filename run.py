@@ -284,4 +284,4 @@ def answer_question(candidate_id, id):
 if __name__ == "__main__":
 
     app.directory = "./"
-    app.run(host="127.0.0.1", port=5020, debug=True)
+    app.run(host="127.0.0.1", port=5000, debug=True)
