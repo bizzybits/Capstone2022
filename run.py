@@ -118,10 +118,8 @@ def index5():
 def create():
     if request.method == "GET":
         return render_template("createquestion.html")
-
     if request.method == "POST":
         checks = "Check all that apply:"
-        free_form = "Input answer in text box:"
         question_id = request.form["question_id"]
         question_label = request.form["question_label"]
         question_text = request.form["question_text"]
@@ -239,6 +237,7 @@ def answer_question(candidate_id, id):
         checks = "Check all that apply:"
         free_form = "Input answer in text box:"
         boolean = "Boolean"
+        mult_choice = "Multiple Choice"
         if request.method == "GET":
             if question.question_label == checks:
                 options = question.options.split(",")
@@ -253,27 +252,34 @@ def answer_question(candidate_id, id):
                     "user_answer_t_or_f.html", question=question, options=options
                 )
 
+            elif question.question_label == mult_choice:
+                options = question.options.split(",")
+                return render_template(
+                    "user_answer_mult_choice.html", question=question, options=options
+                )
         # USER ANSWERS QUESTION
-        id += 1
-        if question.question_label == checks:  # not picking up second item
-            user_checks = request.form.getlist("answer")  # string, e.g., "Cookies,Pies"
-            # print(user_checks)
-            user_checks = ",".join(user_checks)
-            # print(user_checks)
-            # print(question.answer)
-            # print(QuestionModel.query.filter_by(question_id=id).first())
-            # print(request.form)
-
+        id += 1  # increments to next question
+        if question.question_label == checks:
+            user_checks = request.form.getlist(
+                "answer"
+            )  # string, e.g., ["cookies","pies"]
+            user_checks = ",".join(user_checks)  # now reads "cookies,pies"
             if question.answer == user_checks:
                 correct = True
             else:
                 correct = False
+        # TO DO : refactor with the next 3 options
         elif question.question_label == free_form:
             if question.answer == request.form["answer"]:
                 correct = True
             else:
                 correct = False
         elif question.question_label == boolean:
+            if question.answer == request.form["answer"]:
+                correct = True
+            else:
+                correct = False
+        elif question.question_label == mult_choice:
             if question.answer == request.form["answer"]:
                 correct = True
             else:
