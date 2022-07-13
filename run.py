@@ -66,7 +66,7 @@ def index():
         dibs=test3,
         image2=sketch,
         image3=sketch2,
-        authors=authors
+        authors=authors,
     )
 
 
@@ -238,6 +238,7 @@ def answer_question(candidate_id, id):
         # render this
         checks = "Check all that apply:"
         free_form = "Input answer in text box:"
+        mult_choice = "Multiple Choice"
         if request.method == "GET":
             if question.question_label == checks:
                 options = question.options.split(",")
@@ -246,6 +247,12 @@ def answer_question(candidate_id, id):
                 )
             elif question.question_label == free_form:
                 return render_template("user_answer_free_form.html", question=question)
+            elif question.question_label == mult_choice:
+                options = question.options.split(",")
+                return render_template(
+                    "user_answer_mult_choice.html", question=question, options=options
+                )
+
             # return f"No question exists for question {id}"
         # USER ANSWERS QUESTION
         id += 1
@@ -263,6 +270,11 @@ def answer_question(candidate_id, id):
             else:
                 correct = False
         elif question.question_label == free_form:
+            if question.answer == request.form["answer"]:
+                correct = True
+            else:
+                correct = False
+        elif question.question_label == mult_choice:
             if question.answer == request.form["answer"]:
                 correct = True
             else:
