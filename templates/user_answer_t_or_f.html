@@ -1,0 +1,15 @@
+<form action='' method="POST">
+    <fieldset>
+        <p>{{question.question_id}}</p>
+        <p>{{question.question_text}}</p>
+        {% for option in options %}
+        <div>
+            <input type="radio" name="answer" id="boolean" value={{option}}> <label for="boolean">{{option}}</label>
+        </div>
+        {% endfor %}
+        <br>
+        <div>
+            <button type="submit" name="submit">Submit</button>
+        </div>
+    </fieldset>
+</form>
