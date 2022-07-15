@@ -1,0 +1,29 @@
+{% extends "layouts/main.html" %}
+
+{% block content%}
+
+</body>
+<h1>{{greetings}}</h1>
+<h5>{{detail}}</h5>
+
+
+<div
+        style="display:flex; flex-direction: row; justify-content: center; align-items: center">
+<input id="id_ok" class="btn btn-space" value="Make a Quiz" type="button"
+       onclick="location.href='/makeQuiz';">
+<input id="id_cancel" class="btn btn-space" value="Send a Quiz" type="button"
+       onclick="location.href='/candidates';">
+</div>
+
+<div
+        style="display:flex; flex-direction: row; justify-content: center; align-items: center">
+<input id="id_ok2" class="btn btn-space" value="Review Results" type="button"
+       onclick="location.href='/employer';">
+<input id="id_cancel2" class="btn btn-space" value="Compare Results"
+       type="button"
+       onclick="location.href='/candidates';">
+</div>
+
+</body>
+
+{% endblock %}
