@@ -34,7 +34,7 @@ os.chdir(".")
 print(os.getcwd())
 app = Flask(__name__)
 
-
+print(f" this is the db {os.environ.get('DATABASE_URL2')}")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
     "DATABASE_URL2"
 )  # "sqlite:///quizgame.db"
