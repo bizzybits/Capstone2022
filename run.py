@@ -106,13 +106,34 @@ def index4():
     return render_template("homie2.html", greetings=greetings, detail=detail)
 
 
-@app.route("/client")
+@app.route("/candidates")
 def index5():
-    greetings = """...CLIENT..."""
+    greetings = """Welcome Candidates!"""
 
-    detail = "All the QUESTIONS you will ever need"
+    detail = "We are excited for you to take the next steps in your " \
+             "employment journey."
 
-    return render_template("homie2.html", greetings=greetings, detail=detail)
+    return render_template("candidate.html", greetings=greetings,
+                           detail=detail)
+
+
+@app.route("/employer")
+def index6():
+    greetings = """Welcome Employer!"""
+
+    detail = "Please select from the following options to find the candidate " \
+             "of your dreams"
+
+    return render_template("employer.html", greetings=greetings, detail=detail)
+
+@app.route("/makeQuiz")
+def index7():
+    greetings = """Make a Quiz"""
+
+    detail = "Please select from the following questions to customize your " \
+             "quiz."
+
+    return render_template("makeQuiz.html", greetings=greetings, detail=detail)
 
 
 # CREATE VIEW -- TO REMOVE for FINAL submission -- (for testing only)
