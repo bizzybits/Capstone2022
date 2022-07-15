@@ -1,0 +1,44 @@
+{% extends "layouts/main.html" %}
+
+{% block content%}
+
+</body>
+<h1>{{greetings}}</h1>
+
+<h5>{{detail}}</h5>
+
+<<<<<<< HEAD
+<img src="{{url_for('static', filename='images/brooke-cagle-g1Kr4Ozfoac-unsplash.jpg')}}" align="middle" class="responsive" />
+<h1>Get current date using JavaScript.</h1>
+=======
+<img src={{image}} align="middle" class="responsive" />
+
+<h2 id="displayDateTime"></h2>
+<h2 id="result"></h2>
+</body>
+
+<!--  <script type="text/javascript">-->
+<!--  var today = new Date();-->
+<!--  var day = today.getDay();-->
+<!--  var daylist = ["Sunday","Monday","Tuesday","Wednesday ","Thursday","Friday","Saturday"];-->
+<!--  var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();-->
+<!--  var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();-->
+<!--  var dateTime = date+' '+time;-->
+<!--  var now =today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();-->
+<!--  var elapsed = now - time-->
+
+<!--  document.getElementById("displayDateTime").innerHTML = dateTime + ' <br> Day :- ' + daylist[day];-->
+<!--  document.getElementById("elapsedTime").innerHTML = elapsed;-->
+<!--  </script>-->
+  <script>
+
+Date.prototype.getElapsedTime = function() {
+  var diffDate = new Date(Date.now() - this);
+  return "Elapsed Time: Years: " + (diffDate.getFullYear() - 1970) + ", Months: " + diffDate.getMonth() + ", Days: " + (diffDate.getDate() - 1) + ", Hours: " + diffDate.getHours() + ", Minutes: " + diffDate.getMinutes() + ", Seconds: " + diffDate.getSeconds();
+};
+
+var from = new Date("01/08/1986 04:07:00");
+document.getElementById("result").innerHTML = from.getElapsedTime();
+  </script>
+
+{% endblock %}
