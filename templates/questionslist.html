@@ -1,4 +1,39 @@
-{% for question in questions %}
-<h3>{{question}}</h3>
-<hr>
-{% endfor %}
+
+<table>
+    <thead>
+        <tr>
+            <th>Select</th>
+          <th>ID</th>
+          <th>Category</th>
+          <th>Question</th>
+          <th>Answer</th>
+          <th>Option 1</th>
+          <th>Option 2</th>
+          <th>Option 3</th>
+        </tr>
+    </thead>
+    {% for question in questions %}
+    <tr>
+        <td>
+            <input type="checkbox" value="{{question.question_id}}" />
+        </td>
+        <td>{{question.question_id}}</td>
+        <td>{{question.question_label}}</td>
+        <td>{{question.question_text}}</td>
+        <td>{{question.answer}}</td>
+        <td>{{question.options1}}</td>
+        <td>{{question.options2}}</td>
+        <td>{{question.options3}}</td>
+
+    </tr>
+
+    {% endfor %}
+
+</table>
+
+
+<!--            question_id=qnum,-->
+<!--            question_label=eachQ['category'],-->
+<!--            question_text=eachQ['question'],-->
+<!--            answer=eachQ['correct_answer'],-->
+<!--            options=str(eachQ['-->

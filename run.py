@@ -1,45 +1,95 @@
-from models import db, QuestionModel, AnswerModel
+from models import db, QuestionModel, AnswerModel, Answer
 from flask import Flask, render_template, request, redirect
 import os
 import random
 import urllib.request, json
+from flask_mail import Mail, Message
 
+app = Flask(__name__)
+
+
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+    "DATABASE_URL2"
+)  # "sqlite:///quizgame.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db.init_app(app)
+
+# for email send function
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'synergysimulator@gmail.com'
+app.config['MAIL_PASSWORD'] = 'uujjnzsnnngjkkhg'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True # True if Port = 465
+mail = Mail(app)
 
 # http://getskeleton.com/
 # https://opentdb.com/api_config.php
 
+# export DATABASE_URL2='sqlite:///quizgame.db'
+#os.system(DATABASE_URL2='sqlite:///quizgame.db')
+# python3 run.py
+#global QUESTIONNUMBER
 
 def genKey():
     """
     This function Generates a random value to be used as the key for a test access code
     :return:
     """
-    return random.randint(1, 2000000)
+    return random.randint(1000000, 4000000)
 
 
 def getQuestions(qty):
+    global QUESTIONNUMBER
     baseUrl = "https://opentdb.com/api.php?amount=10"
-    specificUrl = "https://opentdb.com/api.php?amount=10&category=29&difficulty=medium"
-    with urllib.request.urlopen(baseUrl) as url:
+    example = "https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=multiple"
+    specificUrl = "https://opentdb.com/api.php?amount=10&category=18&difficulty=medium&type=multiple"
+    with urllib.request.urlopen(example) as url:
         data = json.loads(url.read().decode())
         print(data)
+    QUESTIONNUMBER = 8888
+    qnum = QUESTIONNUMBER + 1
+    for eachQ in data['results']:
+        print(eachQ)
+        question = QuestionModel(
+            question_id=qnum,
+            question_label=eachQ['category'],
+            question_text=eachQ['question'],
+            answer=eachQ['correct_answer'],
+            options1=str(eachQ['incorrect_answers'][0]),
+            options2=str(eachQ['incorrect_answers'][1]),
+            options3=str(eachQ['incorrect_answers'][2]),
+        )
+        qnum += 1
+        db.session.add(question)
+    db.session.commit()
+
+    return redirect("/questions")
 
 
 def get_question(id):
     return QuestionModel.query.filter_by(question_id=id).first()
 
 
+def emailWork(recpEmail, quizID):
+    #msg = Message('Hello', sender='synergysimulator@gmail.com', recipients=[
+    # 'alhamilton1111@gmail.com'])
+    msg = Message('Hello', sender='synergysimulator@gmail.com', recipients=[recpEmail])
+    msg.body = f"Hello Flask message sent from Flask-Mail this is from " \
+               f"Synergy Simulator: {quizID}"
+
+    # You can also use msg.html to send html templates!
+    # Example:
+    #msg.html = render_template("hello.html") # Template should be in 'templates' folder
+
+    mail.send(msg)
+    return "Your email has been sent!"
+
+
 print(f"Current Working Directory = {os.getcwd()}")
 os.chdir(".")
 print(os.getcwd())
-app = Flask(__name__)
 
-print(f" this is the db {os.environ.get('DATABASE_URL2')}")
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
-    "DATABASE_URL2"
-)  # "sqlite:///quizgame.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-db.init_app(app)
 
 
 # CREATE IF NOT EXISTS
@@ -81,7 +131,7 @@ def index2():
     sketch = "static/images/brooke-cagle-g1Kr4Ozfoac-unsplash.jpg"
 
     return render_template(
-        "homie2.html", greetings=greetings, detail=detail, image=sketch
+        "image.html", greetings=greetings, detail=detail, image=sketch
     )
 
 
@@ -93,7 +143,7 @@ def index3():
     sketch = "static/images/lasse-jensen-mPr2sCjuKAo-unsplash.jpg"
 
     return render_template(
-        "homie2.html", greetings=greetings, detail=detail, image=sketch
+        "image.html", greetings=greetings, detail=detail, image=sketch
     )
 
 
@@ -103,7 +153,7 @@ def index4():
 
     detail = "All the touch you will ever need"
 
-    return render_template("homie2.html", greetings=greetings, detail=detail)
+    return render_template("image.html", greetings=greetings, detail=detail)
 
 
 @app.route("/candidates")
@@ -117,23 +167,40 @@ def index5():
                            detail=detail)
 
 
+@app.route("/sendemail", methods=["GET", "POST"])
+def sendemail():
+    greetings = """Email Sent!"""
+
+    detail = "SENDING EMail to: "
+    emailID = "alhamilton1111@gmail.com"
+    quizzer = genKey() # this needs to move to quiz gen page and be sent to this variable
+    goodNews = emailWork(emailID, quizzer)
+
+    return render_template("emailsent.html", greetings=greetings, detail=detail,
+                           emailTo=emailID, quizID=quizzer, finish=goodNews)
+
 @app.route("/employer")
 def index6():
     greetings = """Welcome Employer!"""
 
     detail = "Please select from the following options to find the candidate " \
              "of your dreams"
+    # DFG
+    QuestionModel.query.delete()
+    getQuestions(10)
 
     return render_template("employer.html", greetings=greetings, detail=detail)
 
-@app.route("/makeQuiz")
+@app.route("/makeQuiz", methods=["GET"])
 def index7():
     greetings = """Make a Quiz"""
 
     detail = "Please select from the following questions to customize your " \
              "quiz."
 
-    return render_template("makeQuiz.html", greetings=greetings, detail=detail)
+    questions = QuestionModel.query.all()
+
+    return render_template("makeQuiz.html", greetings=greetings, detail=detail, questions=questions)
 
 
 # CREATE VIEW -- TO REMOVE for FINAL submission -- (for testing only)
@@ -174,6 +241,11 @@ def create():
 @app.route("/questions")
 def RetrieveQuestionsList():
     questions = QuestionModel.query.all()
+    print(questions[0].question_text)
+#    questions = [dict(q) for q in questions]
+
+
+    print("trying to read DB")
     return render_template("questionslist.html", questions=questions)
 
 
@@ -325,3 +397,6 @@ if __name__ == "__main__":
 
     app.directory = "./"
     app.run(host="127.0.0.1", port=5000, debug=True)
+
+    # export DATABASE_URL2='sqlite:///quizgame.db'
+    # python3 run.py
