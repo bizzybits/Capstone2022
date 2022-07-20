@@ -1,6 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
 
-
 db = SQLAlchemy()
 
 class Keys(db.Model):
@@ -9,11 +8,22 @@ class Keys(db.Model):
 class Quiz(db.Model):
     __tablename__ = 'quizzes'
     id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.Integer, unique=True)
     candidate_id = db.Column(db.Integer, db.ForeignKey('candidates.id'))
-   # completed = db.Column(db.Boolean, server_default=False)
+    email_sent = db.Column(db.Boolean)
+    completed = db.Column(db.Boolean)
     # Quizzes HAS MANY questions.
-    # Candidate connection
-    candidate = db.relationship("CandidateModel")
+    # Candidate connectionhi
+
+    def __init__(self, candidate_id, key, completed=0, email_sent=0):
+        self.candidate_id = candidate_id
+        self.completed = completed
+        self.email_sent = email_sent
+        self.key = key         # self.completed = done
+
+    def __repr__(self):
+        return f"{self.id}:{self.candidate_id}:{self.completed}"
+
 
 # this is a table to relate two models Quiz with its Questions
 class QuizQuestions(db.Model):
@@ -50,10 +60,6 @@ class QuestionModel(db.Model):
         return f"{self.question_text}:{self.question_id}:{self.answer}:{self.options1}:{self.options2}:{self.options3}"
 
 
-# TODO: create Quiz model.
-# TODO: create Candidate model.
-# TODO: create CandidateAnswers model.
-
 class Answer(db.Model):
     __tablename__ = 'answers'
     id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
@@ -62,6 +68,7 @@ class Answer(db.Model):
     correct = db.Column(db.Boolean(), server_default='FALSE', nullable=False)
 
     question = db.relationship('QuestionModel')
+
 
 class AnswerModel(db.Model):
     __tablename__ = "answer_table"
@@ -88,14 +95,12 @@ class CandidateModel(db.Model):
     __tablename__ = "candidates"
 
     id = db.Column(db.Integer, primary_key=True)
-    question_id = db.Column(db.Integer(), unique=True)
-    question_text = db.Column(db.String())
-    answer = db.Column(db.String())
+    name = db.Column(db.String)
+    email = db.Column(db.String)
 
-    def __init__(self, question_id, question_text, answer):
-        self.question_id = question_id
-        self.question_text = question_text
-        self.answer = answer
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
 
     def __repr__(self):
-        return f"{self.question_text}:{self.question_id}"
+        return f"{self.name}:{self.email}"
