@@ -33,6 +33,26 @@ class QuizQuestions(db.Model):
     quiz_id = db.Column(db.Integer, nullable=False)
     question_id = db.Column(db.Integer, nullable=False)
 
+
+class QuizResults(db.Model):
+    __tablename__ = 'quiz_results'
+
+    id = db.Column(db.Integer, primary_key=True)
+    quiz_id = db.Column(db.Integer, nullable=False)
+    candidate_id = db.Column(db.Integer, nullable=False)
+    # total_correct
+    # total_incorrect
+    score = db.Column(db.Float, nullable=False)
+
+class CandidateQuestionAnswers(db.Model):
+    __tablename__ = 'candidate_answers'
+
+    id = db.Column(db.Integer, primary_key=True)
+    question_id = db.Column(db.Integer, nullable=False)
+    candidate_id = db.Column(db.Integer, nullable=False)
+    # answer_id = db.Column(db.Integer, nullable=False)
+    answer = db.Column(db.String, nullable=False)
+
 class QuestionModel(db.Model):
     __tablename__ = "question_table"
 

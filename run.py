@@ -4,6 +4,7 @@ import os
 import random
 import urllib.request, json
 from flask_mail import Mail, Message
+from sqlalchemy.sql.expression import func
 
 app = Flask(__name__)
 
@@ -228,8 +229,6 @@ def quiz():
         return redirect(url_for('quiz'))
 
 
-
-
 # CREATE VIEW -- TO REMOVE for FINAL submission -- (for testing only)
 @app.route("/questions/create", methods=["GET", "POST"])
 def create():
@@ -306,6 +305,42 @@ def add_questions(candidate_id, quiz_id):
 
     return redirect(url_for('quiz'))
 
+
+@app.route('/candidate/quiz', methods=('GET', 'POST'))
+def retrieve_quiz():
+    if request.method == 'GET':
+        return render_template('take_quiz.html')
+
+    elif request.method == 'POST':
+        candidate_email = request.form['email']
+        quiz_key = request.form['key']
+        quiz_match = Quiz.query.filter(Quiz.key == quiz_key).first()
+
+        candidate = CandidateModel.query.filter(CandidateModel.email == candidate_email).first()
+
+        if not candidate:
+            return abort(404)
+
+        if not quiz_match:
+            return abort(404)
+
+        questions = db.session.query(QuestionModel.id, QuestionModel.question_text, QuestionModel.answer, QuestionModel.options1, QuestionModel.options2, QuestionModel.options3).select_from(QuizQuestions).filter(QuestionModel.id == QuizQuestions.question_id).filter(QuizQuestions.quiz_id == quiz_match.id).all()
+
+        processed_questions = []
+
+        for question in questions:
+            question_dict = {}
+            options = [question.answer, question.options1, question.options2, question.options3]
+            random.shuffle(options)
+            question_dict['id'] = question.id
+            question_dict['question'] = question.question_text
+            question_dict['options'] = options
+            processed_questions.append(question_dict)
+
+        # quiz template will take candidate and quiz.
+        return render_template('quiz.html', questions=processed_questions, candidate=candidate, quiz=quiz_match)
+
+
 # RETRIEVE SINGLE QUESTION
 @app.route("/questions/<int:id>")
 def RetrieveSingleQuestion(id):
@@ -339,6 +374,27 @@ def update(id):
         return f"Question with id = {id} Does not exist!"
     return render_template("update.html, question = question")
 
+@app.route('/candidate/<int:candidate_id>/quiz/<int:quiz_id>/answers', methods=['POST'])
+def process_quiz(candidate_id, quiz_id):
+    questions = db.session.query(QuestionModel.id, QuestionModel.question_text, QuestionModel.answer).select_from(QuizQuestions).filter(QuizQuestions.quiz_id == quiz_id).filter(QuestionModel.id == QuizQuestions.question_id).all()
+
+    for question in questions:
+        form_answer = request.form[str(question.id)]
+        correct = form_answer == question.answer
+        # correct = form[question.id] == question.answer
+
+        if correct:
+            print(f'You got {question.id} correct')
+        else:
+            print(f'You got {question.id} wrong')
+
+    # after processing the answers of the quiz, mark the quiz as completed.
+    quiz_match = Quiz.query.filter(Quiz.id == quiz_id).first()
+    quiz_match.completed = 1
+    db.session.commit()
+
+    flash('You will be contacted with the results of your quiz shortly.')
+    return redirect('/')
 
 # DELETE QUESTION
 @app.route("/questions/<int:id>/delete", methods=["GET", "POST"])
@@ -474,7 +530,7 @@ def page_not_found(e):
 if __name__ == "__main__":
 
     app.directory = "./"
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    app.run(host="127.0.0.1", port=5003, debug=True)
 
     # https://www.askpython.com/python-modules/flask/flask-flash-method  # Working to properly use FLASH
 
