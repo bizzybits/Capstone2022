@@ -4,12 +4,16 @@ import os
 import random
 import urllib.request, json
 from flask_mail import Mail, Message
+import html
+import time
 from sqlalchemy.sql.expression import func
 
+# Launch FLASK app
 app = Flask(__name__)
 
 app.secret_key = "my_secret_key"
 
+# configure SQL
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
     "DATABASE_URL2"
 )  # "sqlite:///quizgame.db"
@@ -17,6 +21,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
 # for email send function
+# USERNAME: 'synergysimulator@gmail.com' PW 'uujjnzsnnngjkkhg'
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'synergysimulator@gmail.com'
@@ -33,6 +38,7 @@ mail = Mail(app)
 # python3 run.py
 #global QUESTIONNUMBER
 
+# simple key generator utility for quizzes.
 def genKey():
     """
     This function Generates a random value to be used as the key for a test access code
@@ -41,11 +47,14 @@ def genKey():
     return random.randint(1000000, 4000000)
 
 
+# retrieve questions from 3rd party API (Open Trivia Database)
 def getQuestions(qty):
     global QUESTIONNUMBER
     baseUrl = "https://opentdb.com/api.php?amount=10"
     example = "https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=multiple"
     specificUrl = "https://opentdb.com/api.php?amount=10&category=18&difficulty=medium&type=multiple"
+    alternate = "https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=multiple&encode=base64"
+    alternate2 = "https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=multiple&encode=url3986"
     with urllib.request.urlopen(example) as url:
         data = json.loads(url.read().decode())
         print(data)
@@ -55,12 +64,12 @@ def getQuestions(qty):
         print(eachQ)
         question = QuestionModel(
             question_id=qnum,
-            question_label=eachQ['category'],
-            question_text=eachQ['question'],
-            answer=eachQ['correct_answer'],
-            options1=str(eachQ['incorrect_answers'][0]),
-            options2=str(eachQ['incorrect_answers'][1]),
-            options3=str(eachQ['incorrect_answers'][2]),
+            question_label=html.unescape(eachQ['category']),
+            question_text=html.unescape(eachQ['question']),
+            answer=html.unescape(eachQ['correct_answer']),
+            options1=str(html.unescape(eachQ['incorrect_answers'][0])),
+            options2=str(html.unescape(eachQ['incorrect_answers'][1])),
+            options3=str(html.unescape(eachQ['incorrect_answers'][2])),
         )
         qnum += 1
         db.session.add(question)
@@ -68,27 +77,25 @@ def getQuestions(qty):
 
     return redirect("/questions")
 
-
+# Retrieves a single question by ID
 def get_question(id):
     return QuestionModel.query.filter_by(question_id=id).first()
 
-
+# send a candidate a quiz key via email.
+# @param {string} recpEmail - the candidates email.
+# @param {int} quizID - the quiz id
 def emailWork(recpEmail, quizID):
-    #msg = Message('Hello', sender='medleaconsulting@gmail.com', recipients=['davegillis4@gmail.com'])
-    msg = Message('Hello', sender='medleaconsulting@gmail.com', recipients=[recpEmail])
+    #msg = Message
+    msg = Message('Hello', sender='synergysimulator@gmail.com', recipients=[recpEmail])
     msg.body = f"Hello {recpEmail}, your Quiz is ready from Synergy Simulator: {quizID}"
-
-    # You can also use msg.html to send html templates!
-    # Example:
-    #msg.html = render_template("hello.html") # Template should be in 'templates' folder
 
     mail.send(msg)
     return True
 
-
-print(f"Current Working Directory = {os.getcwd()}")
-os.chdir(".")
-print(os.getcwd())
+# Testing purposes only
+# print(f"Current Working Directory = {os.getcwd()}")
+# os.chdir(".")
+# print(os.getcwd())
 
 
 
@@ -97,16 +104,13 @@ print(os.getcwd())
 def create_table():
     db.create_all()
 
-
+# Main route.
+#  Displays the home template.
 @app.route("/")
 def index():
     greetings = """QUIZLET from OSU...
     This app is expressly for the testing employment candidates."""
     greetings2 = "I am a..."
-    test2 = "way too much fun....."
-    ccValue = "349950727078541"
-    test2 = genKey()
-    test3 = genKey()
     sketch = "static/images/Synergy_Simulator.png"
     sketch2 = "static/images/plane.jpg"
     authors = "© 2022 Elizabeth Ponce & Andrea Hamilton, All rights reserved"
@@ -114,14 +118,13 @@ def index():
         "home.html",
         greetings=greetings,
         greetings2=greetings2,
-        dobie=test2,
-        dibs=test3,
         image2=sketch,
         image3=sketch2,
         authors=authors,
     )
 
-
+# About route.
+#  displays image template.
 @app.route("/about")
 def about():
     greetings = """QUIZLET from OSU...
@@ -134,7 +137,8 @@ def about():
         "image.html", greetings=greetings, detail=detail, image=sketch
     )
 
-
+# Help route.
+#  displays image template.
 @app.route("/help")
 def help():
     greetings = """...HELP, HELP, HELP..."""
@@ -146,7 +150,8 @@ def help():
         "image.html", greetings=greetings, detail=detail, image=sketch
     )
 
-
+# Contact route.
+#  displays image template.
 @app.route("/contact")
 def contact():
     greetings = """...CONTACT..."""
@@ -155,7 +160,8 @@ def contact():
 
     return render_template("image.html", greetings=greetings, detail=detail)
 
-
+# candidates route.
+# displays candidate temple.
 @app.route("/candidates")
 def candidates():
     greetings = """Welcome Candidates!"""
@@ -166,19 +172,8 @@ def candidates():
     return render_template("candidate.html", greetings=greetings,
                            detail=detail)
 
-
-@app.route("/sendemail", methods=["GET", "POST"])
-def sendemail():
-    greetings = """Email Sent!"""
-
-    detail = "SENDING EMail to: "
-    emailID = "davegillis4@gmail.com"
-    quizzer = genKey() # this needs to move to quiz gen page and be sent to this variable
-    goodNews = emailWork(emailID, quizzer)
-
-    return render_template("emailsent.html", greetings=greetings, detail=detail,
-                           emailTo=emailID, quizID=quizzer, finish=goodNews)
-
+# employer route.
+# displays employer route.
 @app.route("/employer")
 def index6():
     greetings = """Welcome Employer!"""
@@ -191,7 +186,10 @@ def index6():
 
     return render_template("employer.html", greetings=greetings, detail=detail)
 
-
+# Makequiz route.
+#  Accepts either GET or POST request.
+#  GET: gets all quizzes; displays makeQuiz template.
+#  POST: processes form input, and generates a new quiz for a given candidate. redirects back to Makequiz (quiz) route
 @app.route("/makeQuiz", methods=["GET", "POST"])
 def quiz():
     if request.method == 'GET':
@@ -230,6 +228,7 @@ def quiz():
 
 
 # CREATE VIEW -- TO REMOVE for FINAL submission -- (for testing only)
+# TODO: This route is unused in current site imlementation. Should be safe to remove. See `get_questions` route.
 @app.route("/questions/create", methods=["GET", "POST"])
 def create():
     if request.method == "GET":
@@ -276,6 +275,8 @@ def RetrieveQuestionsList(candidate_id, quiz_id):
     # TODO: get all questions already associated with this quiz.
     return render_template("questionslist.html", quiz=candidate_quiz, questions=questions, candidate=candidate)
 
+# add_questions route.
+#  takes a list of questions and associates them with a given quiz and given candidate.
 @app.route('/candidate/<int:candidate_id>/quiz/<int:quiz_id>/add', methods=['POST'])
 def add_questions(candidate_id, quiz_id):
     q_selection = request.form.getlist('questions')
@@ -305,7 +306,8 @@ def add_questions(candidate_id, quiz_id):
 
     return redirect(url_for('quiz'))
 
-
+# candidate/quiz route.
+# Candidate requests quiz assigned to them to take.
 @app.route('/candidate/quiz', methods=('GET', 'POST'))
 def retrieve_quiz():
     if request.method == 'GET':
@@ -342,6 +344,7 @@ def retrieve_quiz():
 
 
 # RETRIEVE SINGLE QUESTION
+# TODO: not used in current implementation. Should be safe to remove.
 @app.route("/questions/<int:id>")
 def RetrieveSingleQuestion(id):
     question = get_question(id)
@@ -351,6 +354,7 @@ def RetrieveSingleQuestion(id):
 
 
 # UPDATE QUESTION
+# TODO: not used in current site implementation. Should be safe to remove.
 @app.route("/questions/<int:id>/update", methods=["GET", "POST"])
 def update(id):
     question = QuestionModel.query.filter_by(question_id=id).first()
@@ -374,6 +378,11 @@ def update(id):
         return f"Question with id = {id} Does not exist!"
     return render_template("update.html, question = question")
 
+# process_quiz route.
+#   grabs questions for a given quiz; compares known answer to given answers. Marks the matching quiz to completed.
+# TODO: add scoring
+# TODO: email score to candidate.
+# TODO: store general results in db. {QuizResults}
 @app.route('/candidate/<int:candidate_id>/quiz/<int:quiz_id>/answers', methods=['POST'])
 def process_quiz(candidate_id, quiz_id):
     questions = db.session.query(QuestionModel.id, QuestionModel.question_text, QuestionModel.answer).select_from(QuizQuestions).filter(QuizQuestions.quiz_id == quiz_id).filter(QuestionModel.id == QuizQuestions.question_id).all()
@@ -397,6 +406,7 @@ def process_quiz(candidate_id, quiz_id):
     return redirect('/')
 
 # DELETE QUESTION
+# TODO: This route is not used in current site. Should be safe to delete it.
 @app.route("/questions/<int:id>/delete", methods=["GET", "POST"])
 def delete_question(id):
     question = QuestionModel.query.filter_by(question_id=id).first()
@@ -410,6 +420,7 @@ def delete_question(id):
 
 
 # DELETE CANDIDATE -- TO DO
+# TODO: This route needs to be revisited for proper usage.
 @app.route("/candidates/<int:id>/delete", methods=["GET", "POST"])
 def delete_candidate(id):
     question = AnswerModel.query.filter_by(candidate_id=id).first()
@@ -421,7 +432,8 @@ def delete_candidate(id):
         abort(404)
     return render_template("delete.html")
 
-
+# answer_question route.
+#  TODO: not used in current site. Should be safe to delete.
 @app.route("/answerquestion/<int:candidate_id>/<int:id>", methods=["GET", "POST"])
 def answer_question(candidate_id, id):
     # USER ASKED QUESTION
@@ -498,6 +510,8 @@ def answer_question(candidate_id, id):
         return redirect(f"/answerquestion/{candidate_id}/{id}")
     return f"No question exists for question {id}"
 
+# register_user route.
+#  simple user registration.
 @app.route('/register', methods=['GET', 'POST'])
 def register_user():
     print(request.method)
@@ -519,10 +533,14 @@ def register_user():
         flash('User successfully registered', 'success')
         return redirect(url_for('candidates'))
 
+# take_quiz route.
+# TODO: Currently unused, should be safe to delete.
 @app.route('/quiz/<int:key>')
 def take_quiz(key):
     return 'you are taking a quiz.'
 
+# page_not_found error handler page.
+#  display generic 404 page when 404 code is sent.
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
@@ -532,7 +550,6 @@ if __name__ == "__main__":
     app.directory = "./"
     app.run(host="127.0.0.1", port=5003, debug=True)
 
-    # https://www.askpython.com/python-modules/flask/flask-flash-method  # Working to properly use FLASH
-
+    # https://www.askpython.com/python-modules/flask/flask-flash-method
     # export DATABASE_URL2='sqlite:///quizgame.db'
     # python3 run.py

@@ -8,14 +8,6 @@
 <h5>{{detail}}</h5>
 
 <!--USE FOR Notifying user politely what went wrong-->
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-        {% for message in messages %}
-        <div style="color: red; padding: 8px; border-radius: 2px; margin-bottom:8px">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-
 <div>
     <select form="makeQuiz" id='candidate' name="candidate">
         {% if candidates|length > 0 %}
