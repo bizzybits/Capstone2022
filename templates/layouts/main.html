@@ -17,9 +17,8 @@
 
         <link rel="stylesheet" href="/static/css/normalize.css"/>
         <link rel="stylesheet" href="/static/css/skeleton.css"/>
-        <link rel="stylesheet" href="/static/css/style.css"/>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
+        <link rel="stylesheet" href="/static/css/style.css"/>
 
     </head>
 
@@ -43,7 +42,15 @@
                 <i class="fa fa-bars"></i>
             </a>
         </div>
-
+            {% block errors %}
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                    <div style="color: red; padding: 8px; border-radius: 2px; margin-bottom:8px">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            {% endblock %}
             <div style="clear: both">
                 &nbsp;
 

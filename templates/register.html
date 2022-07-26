@@ -4,15 +4,6 @@
 <div>
     Please register an account with us
 </div>
-
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-        {% for message in messages %}
-        <div style="color: red; padding: 8px; border-radius: 2px; margin-bottom:8px">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-
 <form
         id="register"
         name="register"
