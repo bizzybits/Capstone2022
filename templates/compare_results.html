@@ -1,0 +1,11 @@
+{% extends "layouts/main.html" %}
+{% block content%}
+
+<p>hello</p>
+<p>{{ quiz_result.quiz_id }}</p>
+<p>{{ quiz_result.candidate_id }}</p>
+<p>{{ quiz_result.total_correct }}</p>
+<p>{{ quiz_result.total_incorrect }}</p>
+<p>{{ quiz_result.score * 100 }}</p>
+
+{% endblock %}
