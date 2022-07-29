@@ -447,14 +447,14 @@ def get_results_for_candidate():
 
     elif request.method == "POST":
         results1 = request.form["quiz_id"]
-        print(results1)
-        do_this = QuizResults.query.filter(QuizResults.quiz_id).first()
-        if do_this:
-            print(do_this)
-        if not do_this:
+        print(f"results1 = {results1}")
+        quiz_result = QuizResults.query.filter(QuizResults.quiz_id).first()
+        if quiz_result:
+            print(f"do_this = {quiz_result.quiz_id}")
+        if not quiz_result:
             return abort(404)
 
-        return render_template("compare_results.html", quiz_id=quiz)
+        return render_template("compare_results.html", quiz_result=quiz_result)
 
 
 # DELETE CANDIDATE -- TO DO
