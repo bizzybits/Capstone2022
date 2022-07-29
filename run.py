@@ -7,6 +7,7 @@ from models import (
     Keys,
     CandidateModel,
     QuizQuestions,
+    QuizResults,
 )
 from flask import Flask, render_template, request, redirect, url_for, flash, abort
 import os
@@ -250,41 +251,6 @@ def quiz():
         return redirect(url_for("quiz"))
 
 
-# # CREATE VIEW -- TO REMOVE for FINAL submission -- (for testing only)
-# # TODO: This route is unused in current site imlementation. Should be safe to remove. See `get_questions` route.
-# @app.route("/questions/create", methods=["GET", "POST"])
-# def create():
-#     if request.method == "GET":
-#         return render_template("createquestion.html")
-#     if request.method == "POST":
-#         checks = "Check all that apply:"
-#         question_id = request.form["question_id"]
-#         question_label = request.form["question_label"]
-#         question_text = request.form["question_text"]
-#         answer = request.form["answer"]
-#         options = request.form["options"]
-#         if question_label == checks:
-
-#             question = QuestionModel(
-#                 question_id=question_id,
-#                 question_label=question_label,
-#                 question_text=question_text,
-#                 answer=answer,
-#                 options=options,
-#             )
-#         else:
-#             question = QuestionModel(
-#                 question_id=question_id,
-#                 question_label=question_label,
-#                 question_text=question_text,
-#                 answer=answer,
-#                 options=options,
-#             )
-#         db.session.add(question)
-#         db.session.commit()
-#         return redirect("/questions")
-
-
 # RETRIEVE LIST OF QUESTIONS
 @app.route("/candidate/<int:candidate_id>/quiz/<int:quiz_id>")
 def RetrieveQuestionsList(candidate_id, quiz_id):
@@ -402,41 +368,6 @@ def retrieve_quiz():
         )
 
 
-# # RETRIEVE SINGLE QUESTION
-# # TODO: not used in current implementation. Should be safe to remove.
-# @app.route("/questions/<int:id>")
-# def RetrieveSingleQuestion(id):
-#     question = get_question(id)
-#     if question:
-#         return render_template("questions.html", question=question)
-#     return f"Question with id = {id} Doesn't exist"
-
-
-# # UPDATE QUESTION
-# # TODO: not used in current site implementation. Should be safe to remove.
-# @app.route("/questions/<int:id>/update", methods=["GET", "POST"])
-# def update(id):
-#     question = QuestionModel.query.filter_by(question_id=id).first()
-#     if request.method == "POST":
-#         if question:
-#             db.session.delete(question)
-#             db.session.commit()
-#             question_label = request.form["question_label"]
-#             question_text = request.form["question_text"]
-#             answer = request.form["answer"]
-#             question = QuestionModel(
-#                 question_id=id,
-#                 question_label=question_label,
-#                 question_text=question_text,
-#                 answer=answer,
-#             )
-
-#             db.session.add(question)
-#             db.session.commit()
-#             return redirect(f"/questions/{id}")
-#         return f"Question with id = {id} Does not exist!"
-#     return render_template("update.html, question = question")
-
 # process_quiz route.
 #   grabs questions for a given quiz; compares known answer to given answers. Marks the matching quiz to completed.
 # TODO: add scoring
@@ -454,37 +385,58 @@ def process_quiz(candidate_id, quiz_id):
         .all()
     )
 
+    total_questions = 0
+    right = 0
+    wrong = 0
+
     for question in questions:
         form_answer = request.form[str(question.id)]
         correct = form_answer == question.answer
-        # correct = form[question.id] == question.answer
+        print(form_answer)
+        print(question.answer)
 
         if correct:
             print(f"You got {question.id} correct")
+            right += 1
+            total_questions += 1
+            print(right)
+
         else:
             print(f"You got {question.id} wrong")
+            wrong += 1
+            total_questions += 1
+            print(wrong)
 
+    print(f"total correct, {right}")
+    print(f"total incorrect, {wrong}")
+    print(f"total questions, {total_questions}")
     # after processing the answers of the quiz, mark the quiz as completed.
     quiz_match = Quiz.query.filter(Quiz.id == quiz_id).first()
     quiz_match.completed = 1
+
+    score = right / total_questions
+    new_results = QuizResults(quiz_id, candidate_id, wrong, right, score)
+    wrong = new_results.total_incorrect
+    right = new_results.total_correct
+    score = new_results.score
+    Quiz.id = new_results.quiz_id
+    Quiz.candidate_id = new_results.candidate_id
+
+    db.session.add(new_results)
     db.session.commit()
 
     flash("You will be contacted with the results of your quiz shortly.")
     return redirect("/")
 
 
-# DELETE QUESTION
-# TODO: This route is not used in current site. Should be safe to delete it.
-@app.route("/questions/<int:id>/delete", methods=["GET", "POST"])
-def delete_question(id):
-    question = QuestionModel.query.filter_by(question_id=id).first()
-    if request.method == "POST":
-        if question:
-            db.session.delete(question)
-            db.session.commit()
-            return redirect("/questions")
-        abort(404)
-    return render_template("delete.html")
+@app.route("/getresults", methods=["GET"])
+def get_results_for_candidate():
+    candidates = QuizResults.query.filter_by(candidate_id=id).first()
+    if request.method == "GET":
+        if candidates:
+            return render_template(
+                "get_results.html", candidates=candidates.candidate_id
+            )
 
 
 # DELETE CANDIDATE -- TO DO
@@ -499,85 +451,6 @@ def delete_candidate(id):
             return redirect("/candidates")
         abort(404)
     return render_template("delete.html")
-
-
-# answer_question route.
-#  TODO: not used in current site. Should be safe to delete.
-# @app.route("/answerquestion/<int:candidate_id>/<int:id>", methods=["GET", "POST"])
-# def answer_question(candidate_id, id):
-#     # USER ASKED QUESTION
-#     question = get_question(id)
-#     while question is not None:
-#         # If question is a free form
-#         # render this template
-#         # if quetions is some other form
-#         # render other template
-#         # if question is this kind
-#         # render other
-#         # if other kind
-#         # render this
-#         checks = "Check all that apply:"
-#         free_form = "Input answer in text box:"
-#         boolean = "Boolean"
-#         mult_choice = "Multiple Choice"
-#         if request.method == "GET":
-#             if question.question_label == checks:
-#                 options = question.options.split(",")
-#                 return render_template(
-#                     "user_answer_check.html", question=question, options=options
-#                 )
-#             elif question.question_label == free_form:
-#                 return render_template("user_answer_free_form.html", question=question)
-#             elif question.question_label == boolean:
-#                 options = question.options.split(",")
-#                 return render_template(
-#                     "user_answer_t_or_f.html", question=question, options=options
-#                 )
-
-#             elif question.question_label == mult_choice:
-#                 options = question.options.split(",")
-#                 return render_template(
-#                     "user_answer_mult_choice.html", question=question, options=options
-#                 )
-#         # USER ANSWERS QUESTION
-#         id += 1  # increments to next question
-#         if question.question_label == checks:
-#             user_checks = request.form.getlist(
-#                 "answer"
-#             )  # string, e.g., ["cookies","pies"]
-#             user_checks = ",".join(user_checks)  # now reads "cookies,pies"
-#             if question.answer == user_checks:
-#                 correct = True
-#             else:
-#                 correct = False
-#         # TO DO : refactor with the next 3 options
-#         elif question.question_label == free_form:
-#             if question.answer == request.form["answer"]:
-#                 correct = True
-#             else:
-#                 correct = False
-#         elif question.question_label == boolean:
-#             if question.answer == request.form["answer"]:
-#                 correct = True
-#             else:
-#                 correct = False
-#         elif question.question_label == mult_choice:
-#             if question.answer == request.form["answer"]:
-#                 correct = True
-#             else:
-#                 correct = False
-#         question_id = question.question_id
-#         question_label = question.question_label
-#         candidate_id = candidate_id
-#         answer = question.answer
-#         graded_answer = AnswerModel(
-#             question_id, candidate_id, question_label, answer, correct
-#         )
-#         print(correct)
-#         db.session.add(graded_answer)
-#         db.session.commit()
-#         return redirect(f"/answerquestion/{candidate_id}/{id}")
-#     return f"No question exists for question {id}"
 
 
 # register_user route.
@@ -602,13 +475,6 @@ def register_user():
         db.session.commit()
         flash("User successfully registered", "success")
         return redirect(url_for("candidates"))
-
-
-# # take_quiz route.
-# # TODO: Currently unused, should be safe to delete.
-# @app.route("/quiz/<int:key>")
-# def take_quiz(key):
-#     return "you are taking a quiz."
 
 
 # page_not_found error handler page.
