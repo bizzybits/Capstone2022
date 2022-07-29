@@ -429,14 +429,14 @@ def process_quiz(candidate_id, quiz_id):
     return redirect("/")
 
 
-@app.route("/getresults", methods=["GET"])
+@app.route("/results", methods=["GET"])
 def get_results_for_candidate():
-    candidates = QuizResults.query.filter_by(candidate_id=id).first()
+    candidates = db.session.query(
+        QuizResults.quiz_id, QuizResults.candidate_id, QuizResults.score
+    )
     if request.method == "GET":
         if candidates:
-            return render_template(
-                "get_results.html", candidates=candidates.candidate_id
-            )
+            return render_template("results.html", candidate_id=candidates)
 
 
 # DELETE CANDIDATE -- TO DO
