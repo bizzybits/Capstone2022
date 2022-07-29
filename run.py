@@ -429,14 +429,32 @@ def process_quiz(candidate_id, quiz_id):
     return redirect("/")
 
 
-@app.route("/results", methods=["GET"])
+# route from employers to return individual results of on candidate
+
+
+@app.route("/results", methods=["GET", "POST"])
 def get_results_for_candidate():
-    candidates = db.session.query(
-        QuizResults.quiz_id, QuizResults.candidate_id, QuizResults.score
+    results = db.session.query(
+        QuizResults.id,
+        QuizResults.quiz_id,
+        QuizResults.candidate_id,
+        QuizResults.candidate_id,
+        QuizResults.score,
     )
+
     if request.method == "GET":
-        if candidates:
-            return render_template("results.html", candidate_id=candidates)
+        return render_template("results.html", quiz_id=quiz)
+
+    elif request.method == "POST":
+        results1 = request.form["quiz_id"]
+        print(results1)
+        do_this = QuizResults.query.filter(QuizResults.quiz_id).first()
+        if do_this:
+            print(do_this)
+        if not do_this:
+            return abort(404)
+
+        return render_template("compare_results.html", quiz_id=quiz)
 
 
 # DELETE CANDIDATE -- TO DO
