@@ -412,16 +412,21 @@ def process_quiz(candidate_id, quiz_id):
     print(f"total questions, {total_questions}")
     # after processing the answers of the quiz, mark the quiz as completed.
     quiz_match = Quiz.query.filter(Quiz.id == quiz_id).first()
-    quiz_match.completed = 1
-
+    quiz_match.completed = True
+    print(f"quiz match id is {quiz_match.id}")
+    print(f"quiz id is {quiz_id}")
+    print(f"candidate id is {candidate_id}")
+    
     score = right / total_questions
     new_results = QuizResults(quiz_id, candidate_id, wrong, right, score)
+   
     wrong = new_results.total_incorrect
     right = new_results.total_correct
     score = new_results.score
-    Quiz.id = new_results.quiz_id
-    Quiz.candidate_id = new_results.candidate_id
-
+    new_results.quiz_id = quiz_match.id
+    new_results.candidate_id = candidate_id
+   
+    
     db.session.add(new_results)
     db.session.commit()
 
@@ -434,27 +439,38 @@ def process_quiz(candidate_id, quiz_id):
 
 @app.route("/results", methods=["GET", "POST"])
 def get_results_for_candidate():
-    results = db.session.query(
-        QuizResults.id,
-        QuizResults.quiz_id,
-        QuizResults.candidate_id,
-        QuizResults.candidate_id,
-        QuizResults.score,
-    )
+    # quiz_match= db.session.query(
+    #     Quiz.id,
+    #     Quiz.key,
+    #     Quiz.candidate_id,
+    #     Quiz.email_sent,
+    #     Quiz.completed
+    # )
+    
+    # candidate_result = db.session.query(
+    #     QuizResults.id,
+    #     QuizResults.quiz_id,
+    #     QuizResults.candidate_id,
+    #     QuizResults.total_correct,
+    #     QuizResults.total_incorrect,
+    #     QuizResults.score
+    # )
 
     if request.method == "GET":
-        return render_template("results.html", quiz_id=quiz)
+        return render_template("results.html")
 
     elif request.method == "POST":
-        results1 = request.form["quiz_id"]
-        print(f"results1 = {results1}")
-        quiz_result = QuizResults.query.filter(QuizResults.quiz_id).first()
+        quiz_key = request.form["quiz_id"]
+        print(f"results1 = {quiz_key}")
+        quiz_result = Quiz.query.filter(Quiz.key == quiz_key).first()
+        cand_result = QuizResults.query.filter(QuizResults.quiz_id == quiz_result.id).first()
         if quiz_result:
-            print(f"do_this = {quiz_result.quiz_id}")
+            print(f"do_this = {quiz_result.id}")
+            print(f"candidate result for quiz id is{cand_result} ")
         if not quiz_result:
             return abort(404)
 
-        return render_template("compare_results.html", quiz_result=quiz_result)
+        return render_template("compare_results.html", cand_result=cand_result)
 
 
 # DELETE CANDIDATE -- TO DO
