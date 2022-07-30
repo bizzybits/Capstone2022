@@ -1,17 +1,13 @@
 {% extends "layouts/main.html" %}
 
 {% block content%}
-<div>Please enter Quiz ID to view Candidate's Results! Thank you.</div>
+<div>Please enter Quiz Key to view Candidate's Results! Thank you.</div>
 <form id="results" name="results" method="POST" action="{{ url_for('get_results_for_candidate') }}">
     <label>
-        Quiz Id:
-        <input type="quiz_id" name="quiz_id" id="quiz_id" />
-    </label>
-
-    <!-- <label>
         Quiz Key:
         <input type="text" name="key" id="key" />
-    </label> -->
+    </label>
+
     <button type="submit">Get Candidate Results</button>
 </form>
 {% endblock %}

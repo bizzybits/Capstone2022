@@ -460,17 +460,19 @@ def get_results_for_candidate():
         return render_template("results.html")
 
     elif request.method == "POST":
-        quiz_key = request.form["quiz_id"]
+        quiz_key = request.form["key"]
         print(f"results1 = {quiz_key}")
         quiz_result = Quiz.query.filter(Quiz.key == quiz_key).first()
         cand_result = QuizResults.query.filter(QuizResults.quiz_id == quiz_result.id).first()
+        candidate = CandidateModel.query.filter(CandidateModel.id == cand_result.candidate_id).first()
+        print(f"lala {candidate.name}")
         if quiz_result:
             print(f"do_this = {quiz_result.id}")
             print(f"candidate result for quiz id is{cand_result} ")
         if not quiz_result:
             return abort(404)
 
-        return render_template("compare_results.html", cand_result=cand_result)
+        return render_template("candidate_results.html", cand_result=cand_result, candidate=candidate)
 
 
 # DELETE CANDIDATE -- TO DO

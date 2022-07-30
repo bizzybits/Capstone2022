@@ -11,21 +11,16 @@
 <div>
     <select form="makeQuiz" id='candidate' name="candidate">
         {% if candidates|length > 0 %}
-            {% for candidate in candidates %}
-            <option value="{{ candidate.id }}">{{ candidate.email }}</option>
-            {% endfor %}
+        {% for candidate in candidates %}
+        <option value="{{ candidate.id }}">{{ candidate.email }}</option>
+        {% endfor %}
         {% else %}
         <option value="*">No candidates registered</option>
         {% endif %}
     </select>
 </div>
 
-<form
-        id="makeQuiz"
-        name="makeQuiz"
-        action="{{ url_for('quiz') }}"
-        method="POST"
->
+<form id="makeQuiz" name="makeQuiz" action="{{ url_for('quiz') }}" method="POST">
     <button form="makeQuiz" type="submit">
         Create Quiz
     </button>
@@ -36,6 +31,7 @@
     <thead>
         <tr>
             <th>ID</th>
+            <th>Quiz Key</th>
             <th>Candidate Name</th>
             <th>Candidate Email</th>
             <th>Completed?</th>
@@ -44,10 +40,11 @@
         </tr>
     </thead>
     <tbody>
-    {% if quizzes|length > 0 %}
+        {% if quizzes|length > 0 %}
         {% for quiz in quizzes %}
         <tr>
             <td>{{ quiz[0].id }}</td>
+            <td>{{ quiz[0].key }}</td>
             <td>{{ quiz[1].name }}</td>
             <td>{{ quiz[1].email }}</td>
             <td>{{ quiz[0].completed }}</td>
@@ -56,17 +53,19 @@
                 {% if quiz[0].email_sent %}
                 <span>Quiz sent to Candidate</span>
                 {% else %}
-                <a class="btn btn-success" href="{{ url_for('RetrieveQuestionsList', quiz_id=quiz[0].id, candidate_id=quiz[1].id) }}">Add Questions</a>
+                <a class="btn btn-success"
+                    href="{{ url_for('RetrieveQuestionsList', quiz_id=quiz[0].id, candidate_id=quiz[1].id) }}">Add
+                    Questions</a>
                 {% endif %}
             </td>
-<!--            TODO: create a delete button for a quiz. -->
+            <!--            TODO: create a delete button for a quiz. -->
         </tr>
         {% endfor %}
-    {% else %}
+        {% else %}
         <tr>
             <td>No outstanding quizzes.</td>
         </tr>
-    {% endif %}
+        {% endif %}
     </tbody>
 </table>
 
