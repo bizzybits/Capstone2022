@@ -8,8 +8,10 @@ from models import (
     CandidateModel,
     QuizQuestions,
     QuizResults,
+    User
 )
 from flask import Flask, render_template, request, redirect, url_for, flash, abort
+from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 import os
 import random
 import urllib.request, json
@@ -438,23 +440,6 @@ def process_quiz(candidate_id, quiz_id):
 # route from employers to return individual results of on candidate
 @app.route("/results", methods=["GET", "POST"])
 def get_results_for_candidate():
-    # quiz_match= db.session.query(
-    #     Quiz.id,
-    #     Quiz.key,
-    #     Quiz.candidate_id,
-    #     Quiz.email_sent,
-    #     Quiz.completed
-    # )
-    
-    # candidate_result = db.session.query(
-    #     QuizResults.id,
-    #     QuizResults.quiz_id,
-    #     QuizResults.candidate_id,
-    #     QuizResults.total_correct,
-    #     QuizResults.total_incorrect,
-    #     QuizResults.score
-    # )
-
     if request.method == "GET":
         return render_template("results.html")
 
@@ -533,6 +518,56 @@ def register_user():
         db.session.commit()
         flash("User successfully registered", "success")
         return redirect(url_for("candidates"))
+
+
+
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def get(id):
+    return User.query.get(id)
+
+
+@app.route('/login',methods=['GET'])
+def get_login():
+    return render_template('emp_login.html')
+
+
+@app.route('/signup',methods=['GET'])
+def get_signup():
+    return render_template('emp_signup.html')
+
+@app.route('/login',methods=['POST'])
+def login_post():
+    email = request.form['email']
+    password = request.form['password']
+    user = User.query.filter_by(email=email).first()
+    if user:
+        login_user(user)
+        return redirect('/')
+    else:
+        flash("No User with those credentials, please register.", "error")
+        return redirect('/signup')
+
+@app.route('/signup',methods=['POST'])
+def signup_post():
+    username = request.form['username']
+    email = request.form['email']
+    password = request.form['password']
+    user = User(username=username,email=email,password=password)
+    db.session.add(user)
+    db.session.commit()
+    user = User.query.filter_by(email=email).first()
+    login_user(user)
+    return redirect('/')
+
+@app.route('/logout',methods=['GET'])
+def logout():
+    logout_user()
+    return redirect('/login')
+
 
 
 # page_not_found error handler page.

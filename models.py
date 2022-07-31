@@ -1,8 +1,16 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 
 # from run import quiz
 
 db = SQLAlchemy()
+
+
+class User(UserMixin,db.Model):
+    id = db.Column(db.Integer,primary_key=True,autoincrement=True)
+    username = db.Column(db.String(200))
+    email = db.Column(db.String(200))
+    password = db.Column(db.String(200))
 
 
 class Keys(db.Model):
