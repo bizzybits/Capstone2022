@@ -412,11 +412,12 @@ def process_quiz(candidate_id, quiz_id):
     print(f"total questions, {total_questions}")
     # after processing the answers of the quiz, mark the quiz as completed.
     quiz_match = Quiz.query.filter(Quiz.id == quiz_id).first()
+
     quiz_match.completed = True
     print(f"quiz match id is {quiz_match.id}")
     print(f"quiz id is {quiz_id}")
     print(f"candidate id is {candidate_id}")
-    
+
     score = right / total_questions
     new_results = QuizResults(quiz_id, candidate_id, wrong, right, score)
    
@@ -435,8 +436,6 @@ def process_quiz(candidate_id, quiz_id):
 
 
 # route from employers to return individual results of on candidate
-
-
 @app.route("/results", methods=["GET", "POST"])
 def get_results_for_candidate():
     # quiz_match= db.session.query(
@@ -474,6 +473,29 @@ def get_results_for_candidate():
 
         return render_template("candidate_results.html", cand_result=cand_result, candidate=candidate)
 
+
+@app.route("/allresults", methods=["GET"])
+def get_results_for_all_candidates():
+    if request.method == "GET":
+        results = db.session.query(
+            QuizResults.id,
+            QuizResults.quiz_id,
+            QuizResults.candidate_id,
+            QuizResults.candidate_id,
+            QuizResults.score,
+        )
+        
+        candidates = db.session.query(
+            CandidateModel.id,
+            CandidateModel.name,
+            CandidateModel.email
+        )
+        
+        if candidates:
+            if results:
+                return render_template("all_candidate_results.html", candidates=candidates, results=results)
+            
+            
 
 # DELETE CANDIDATE -- TO DO
 # TODO: This route needs to be revisited for proper usage.
