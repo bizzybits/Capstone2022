@@ -561,7 +561,7 @@ def signup_post():
     db.session.commit()
     user = User.query.filter_by(email=email).first()
     login_user(user)
-    return redirect('/')
+    return redirect('/login')
 
 @app.route('/logout',methods=['GET'])
 def logout():
