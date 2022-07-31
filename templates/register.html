@@ -1,0 +1,24 @@
+{% extends "layouts/main.html" %}
+
+{% block content%}
+<div>
+    Please register an account with us
+</div>
+<form
+        id="register"
+        name="register"
+        method="POST"
+        action="{{ url_for('register_user') }}"
+>
+    <label>
+        Name:
+        <input type="text" name="name" id="name" />
+    </label>
+    <label>
+        Email:
+        <input type="email" name="email" id="email" />
+    </label>
+    <button type="submit">Register</button>
+</form>
+
+{% endblock %}

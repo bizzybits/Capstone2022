@@ -1,0 +1,14 @@
+{% extends "layouts/main.html" %}
+{% block content%}
+
+<div>Here are the results for {{ candidate.name }} who took quiz {{cand_result.quiz_id}} Thank you.</div>
+
+<h3>Candidate Name: {{ candidate.name }}</h3>
+<h3>Candidate ID: {{ candidate.id }}</h3>
+<h3>Candidate Email: {{ candidate.email }}</h3>
+<h3>Quiz ID: {{ cand_result.quiz_id }}</h3>
+<h3>NUMBER CORRECT: {{ cand_result.total_correct }}</h3>
+<h3>NUMBER INCORRECT: {{ cand_result.total_incorrect }}</h3>
+<h3>TOTAL SCORE: {{ cand_result.score * 100 }}</h3>
+
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "layouts/main.html" %}
+
+{% block content%}
+<div>Please enter Quiz Key to view Candidate's Results! Thank you.</div>
+<form id="results" name="results" method="POST" action="{{ url_for('get_results_for_candidate') }}">
+    <label>
+        Quiz Key:
+        <input type="text" name="key" id="key" />
+    </label>
+
+    <button type="submit">Get Candidate Results</button>
+</form>
+{% endblock %}
