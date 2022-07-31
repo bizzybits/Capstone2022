@@ -546,7 +546,7 @@ def login_post():
     user = User.query.filter_by(email=email).first()
     if user:
         login_user(user)
-        return redirect('/')
+        return redirect('/employer')
     else:
         flash("No User with those credentials, please register.", "error")
         return redirect('/signup')
