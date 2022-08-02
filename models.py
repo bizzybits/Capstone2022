@@ -6,8 +6,8 @@ from flask_login import LoginManager, UserMixin, login_required, login_user, log
 db = SQLAlchemy()
 
 
-class User(UserMixin,db.Model):
-    id = db.Column(db.Integer,primary_key=True,autoincrement=True)
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(200))
     email = db.Column(db.String(200))
     password = db.Column(db.String(200))
@@ -54,13 +54,15 @@ class QuizResults(db.Model):
     candidate_id = db.Column(db.Integer)
     total_correct = db.Column(db.Integer)
     total_incorrect = db.Column(db.Integer)
+    time_taken = db.Column(db.Integer)  # stored in seconds
     score = db.Column(db.Float)
 
-    def __init__(self, quiz_id, candidate_id, total_correct, total_incorrect, score):
+    def __init__(self, quiz_id, candidate_id, total_correct, total_incorrect, time_taken, score):
         self.quiz_id = quiz_id
         self.candidate_id = candidate_id
         self.total_correct = total_correct
         self.total_incorrect = total_incorrect
+        self.time_taken = time_taken
         self.score = score
 
 
