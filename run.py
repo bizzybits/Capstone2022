@@ -479,8 +479,7 @@ def get_results_for_all_candidates():
         if candidates:
             if results:
                 return render_template("all_candidate_results.html", candidates=candidates, results=results)
-            
-            
+             
 
 # DELETE CANDIDATE 
 @app.route("/deleteCandidate", methods=["GET", "POST"])
@@ -504,8 +503,7 @@ def delete_candidate():
             flash("You have deleted the selected Candidate.")
             return redirect("/employer")
         abort(404)
-    return render_template("deleteCandidate.html")
-
+   
 
 # register_user route.
 #  simple user registration.
