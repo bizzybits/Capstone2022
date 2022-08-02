@@ -6,7 +6,7 @@ from flask_login import LoginManager, UserMixin, login_required, login_user, log
 db = SQLAlchemy()
 
 
-class User(UserMixin,db.Model):
+class Employer(UserMixin,db.Model):
     id = db.Column(db.Integer,primary_key=True,autoincrement=True)
     username = db.Column(db.String(200))
     email = db.Column(db.String(200))

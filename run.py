@@ -8,7 +8,7 @@ from models import (
     CandidateModel,
     QuizQuestions,
     QuizResults,
-    User
+    Employer
 )
 from flask import Flask, render_template, request, redirect, url_for, flash, abort
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
@@ -48,7 +48,11 @@ mail = Mail(app)
 # export DATABASE_URL2='sqlite:///quizgame.db'
 # os.system(DATABASE_URL2='sqlite:///quizgame.db')
 # python3 run.py
-# global QUESTIONNUMBER
+
+
+# instantiate login manager for flask-login
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 # simple key generator utility for quizzes.
 def genKey():
@@ -371,10 +375,8 @@ def retrieve_quiz():
 
 
 # process_quiz route.
-#   grabs questions for a given quiz; compares known answer to given answers. Marks the matching quiz to completed.
-# TODO: add scoring
-# TODO: email score to candidate.
-# TODO: store general results in db. {QuizResults}
+#  grabs questions for a given quiz; compares known answer to given answers. 
+#  Marks the matching quiz to completed.
 @app.route("/candidate/<int:candidate_id>/quiz/<int:quiz_id>/answers", methods=["POST"])
 def process_quiz(candidate_id, quiz_id):
     questions = (
@@ -394,31 +396,21 @@ def process_quiz(candidate_id, quiz_id):
     for question in questions:
         form_answer = request.form[str(question.id)]
         correct = form_answer == question.answer
-        print(form_answer)
-        print(question.answer)
 
         if correct:
             print(f"You got {question.id} correct")
             right += 1
             total_questions += 1
-            print(right)
 
         else:
             print(f"You got {question.id} wrong")
             wrong += 1
             total_questions += 1
-            print(wrong)
 
-    print(f"total correct, {right}")
-    print(f"total incorrect, {wrong}")
-    print(f"total questions, {total_questions}")
     # after processing the answers of the quiz, mark the quiz as completed.
     quiz_match = Quiz.query.filter(Quiz.id == quiz_id).first()
 
     quiz_match.completed = True
-    print(f"quiz match id is {quiz_match.id}")
-    print(f"quiz id is {quiz_id}")
-    print(f"candidate id is {candidate_id}")
 
     score = right / total_questions
     new_results = QuizResults(quiz_id, candidate_id, wrong, right, score)
@@ -429,7 +421,6 @@ def process_quiz(candidate_id, quiz_id):
     new_results.quiz_id = quiz_match.id
     new_results.candidate_id = candidate_id
    
-    
     db.session.add(new_results)
     db.session.commit()
 
@@ -445,17 +436,11 @@ def get_results_for_candidate():
 
     elif request.method == "POST":
         quiz_key = request.form["key"]
-        print(f"results1 = {quiz_key}")
         quiz_result = Quiz.query.filter(Quiz.key == quiz_key).first()
         cand_result = QuizResults.query.filter(QuizResults.quiz_id == quiz_result.id).first()
         candidate = CandidateModel.query.filter(CandidateModel.id == cand_result.candidate_id).first()
-        print(f"lala {candidate.name}")
-        if quiz_result:
-            print(f"do_this = {quiz_result.id}")
-            print(f"candidate result for quiz id is{cand_result} ")
         if not quiz_result:
             return abort(404)
-
         return render_template("candidate_results.html", cand_result=cand_result, candidate=candidate)
 
 
@@ -497,7 +482,7 @@ def delete_candidate(id):
 
 
 # register_user route.
-#  simple user registration.
+# user registration.
 @app.route("/register", methods=["GET", "POST"])
 def register_user():
     print(request.method)
@@ -519,49 +504,43 @@ def register_user():
         flash("User successfully registered", "success")
         return redirect(url_for("candidates"))
 
-
-
-
 login_manager = LoginManager()
 login_manager.init_app(app)
 
 @login_manager.user_loader
 def get(id):
-    return User.query.get(id)
+    return Employer.query.get(id)
 
 
-@app.route('/login',methods=['GET'])
-def get_login():
-    return render_template('emp_login.html')
+@app.route('/login',methods=['GET','POST'])
+def employer_login_():
+    if request.method == "GET":
+        return render_template('emp_login.html')
+    if request.method == "POST":
+        email = request.form['email']
+        password = request.form['password']
+        employer = Employer.query.filter_by(email=email).first()
+        if employer:
+            login_user(employer)
+            return redirect('/employer')
+        else:
+            flash("No User with those credentials, please register.", "error")
+            return redirect('/signup')
 
-
-@app.route('/signup',methods=['GET'])
-def get_signup():
-    return render_template('emp_signup.html')
-
-@app.route('/login',methods=['POST'])
-def login_post():
-    email = request.form['email']
-    password = request.form['password']
-    user = User.query.filter_by(email=email).first()
-    if user:
-        login_user(user)
-        return redirect('/employer')
-    else:
-        flash("No User with those credentials, please register.", "error")
-        return redirect('/signup')
-
-@app.route('/signup',methods=['POST'])
-def signup_post():
-    username = request.form['username']
-    email = request.form['email']
-    password = request.form['password']
-    user = User(username=username,email=email,password=password)
-    db.session.add(user)
-    db.session.commit()
-    user = User.query.filter_by(email=email).first()
-    login_user(user)
-    return redirect('/login')
+@app.route('/signup',methods=['GET','POST'])
+def emp_signup():
+    if request.method == "GET":
+        return render_template('emp_signup.html')
+    if request.method == "POST":
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        employer = Employer(username=username,email=email,password=password)
+        db.session.add(employer)
+        db.session.commit()
+        employer = Employer.query.filter_by(email=email).first()
+        login_user(employer)
+        return redirect('/login')
 
 @app.route('/logout',methods=['GET'])
 def logout():
