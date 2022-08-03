@@ -6,7 +6,10 @@
     <div>You have <span id="timer">1:00 </span> Minute Left</div>
     {% if questions %}
     <form id="quiz" name="quiz" method="POST"
-        action="{{ url_for('process_quiz', candidate_id=candidate.id, quiz_id=quiz.id) }}">
+        action="{{ url_for('process_quiz', candidate_id=candidate.id, quiz_id=quiz.id) }}"
+          data-timespent="0"
+    >
+        <input id='tracker' style="display: none" type="number" name="timespent" value="0" />
         {% for question in questions %}
         <div style="display: flex; flex-direction: column; margin-bottom: 64px;">
             <div style="margin-bottom: 16px;">
@@ -40,14 +43,17 @@
 <script>
     const quizForm = document.getElementById('quiz');
     const timerDisplay = document.getElementById('timer');
+    const tracker = document.getElementById('tracker');
     const TIME_LIMIT = 1 * 60; // minutes * seconds/min
     let timeLeft = TIME_LIMIT;
+    let timeTaken = 0;
     const timer = setInterval(() => {
         timeLeft--;
+        timeTaken++;
         let minutes = Math.floor(timeLeft / 60);
         let seconds = Math.floor(timeLeft % 60);
         timerDisplay.innerText = `${minutes}:${seconds}`;
-
+        tracker.value = timeTaken;
         if (timeLeft <= 0) {
             clearInterval(timer);
             quizForm.submit();

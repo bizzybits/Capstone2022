@@ -33,11 +33,11 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
 # for email send function
-# USERNAME: 'synergysimulator@gmail.com' PW 'uujjnzsnnngjkkhg'
+# USERNAME: 'synergysimulator@gmail.com' PW "qnwgsktqadivsdcy"
 app.config["MAIL_SERVER"] = "smtp.gmail.com"
 app.config["MAIL_PORT"] = 465
 app.config["MAIL_USERNAME"] = "synergysimulator@gmail.com"
-app.config["MAIL_PASSWORD"] = "uujjnzsnnngjkkhg"
+app.config["MAIL_PASSWORD"] = "qnwgsktqadivsdcy"
 app.config["MAIL_USE_TLS"] = False
 app.config["MAIL_USE_SSL"] = True  # True if Port = 465
 mail = Mail(app)
@@ -98,11 +98,15 @@ def get_question(id):
 # send a candidate a quiz key via email.
 # @param {string} recpEmail - the candidates email.
 # @param {int} quizID - the quiz id
-def emailWork(recpEmail, quizID):
+def emailWork(email_type, quizID, recpEmail):
     # msg = Message
-    msg = Message("Hello", sender="synergysimulator@gmail.com", recipients=[recpEmail])
-    msg.body = f"Hello {recpEmail}, your Quiz is ready from Synergy Simulator: {quizID}"
-
+    boss = "synergysimulator@gmail.com"
+    if email_type == "inbound":
+        msg = Message("Hello", sender="synergysimulator@gmail.com", recipients=[recpEmail])
+        msg.body = f"Hello {recpEmail}, your Quiz is ready from Synergy Simulator: {quizID}"
+    elif email_type == "quiz_done":
+        msg = Message("Hello", sender="synergysimulator@gmail.com", recipients=[boss])
+        msg.body = f"Hello {recpEmail}, has finished their Synergy Simulator Quiz ID: {quizID}"
     mail.send(msg)
     return True
 
@@ -202,7 +206,7 @@ def index6():
         "Please select from the following options to find the candidate "
         "of your dreams"
     )
-    # DFG
+    #
     QuestionModel.query.delete()
     getQuestions(10)
 
@@ -298,7 +302,7 @@ def add_questions(candidate_id, quiz_id):
         db.session.add(quiz_question)
     db.session.commit()
 
-    result = emailWork(candidate.email, candidate_quiz.key)
+    result = emailWork("inbound", candidate_quiz.key, candidate.email )
 
     if result:
         # db.session.refresh(candidate_quiz_query)
@@ -387,9 +391,18 @@ def process_quiz(candidate_id, quiz_id):
         .all()
     )
 
+    # fetch the user so we can send them an email.
+    candidate = CandidateModel.query.filter(CandidateModel.id == candidate_id).first()
+
+    print('candidate: ', candidate.email)
+
     total_questions = 0
     right = 0
     wrong = 0
+
+    time_elapsed = int(request.form['timespent'])
+
+    print("TIMER: ", time_elapsed)
 
     for question in questions:
         form_answer = request.form[str(question.id)]
@@ -421,7 +434,7 @@ def process_quiz(candidate_id, quiz_id):
     print(f"candidate id is {candidate_id}")
 
     score = right / total_questions
-    new_results = QuizResults(quiz_id, candidate_id, wrong, right, score)
+    new_results = QuizResults(quiz_id, candidate_id, right, wrong, time_elapsed, score)
    
     wrong = new_results.total_incorrect
     right = new_results.total_correct
@@ -432,6 +445,8 @@ def process_quiz(candidate_id, quiz_id):
     
     db.session.add(new_results)
     db.session.commit()
+
+    emailWork('quiz_done', quiz_match.key, candidate.email)
 
     flash("You will be contacted with the results of your quiz shortly.")
     return redirect("/")
@@ -530,7 +545,7 @@ def get(id):
     return User.query.get(id)
 
 
-@app.route('/login',methods=['GET'])
+@app.route('/login', methods=['GET'])
 def get_login():
     return render_template('emp_login.html')
 
@@ -556,7 +571,7 @@ def signup_post():
     username = request.form['username']
     email = request.form['email']
     password = request.form['password']
-    user = User(username=username,email=email,password=password)
+    user = User(username=username, email=email, password=password)
     db.session.add(user)
     db.session.commit()
     user = User.query.filter_by(email=email).first()
@@ -580,7 +595,7 @@ def page_not_found(e):
 if __name__ == "__main__":
 
     app.directory = "./"
-    app.run(host="127.0.0.1", port=5003, debug=True)
+    app.run(host="127.0.0.1", port=5000, debug=True)
 
     # https://www.askpython.com/python-modules/flask/flask-flash-method
     # export DATABASE_URL2='sqlite:///quizgame.db'
