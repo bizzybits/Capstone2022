@@ -494,22 +494,31 @@ def get_results_for_all_candidates():
         if candidates:
             if results:
                 return render_template("all_candidate_results.html", candidates=candidates, results=results)
-            
-            
+             
 
-# DELETE CANDIDATE -- TO DO
-# TODO: This route needs to be revisited for proper usage.
-@app.route("/candidates/<int:id>/delete", methods=["GET", "POST"])
-def delete_candidate(id):
-    question = AnswerModel.query.filter_by(candidate_id=id).first()
+# DELETE CANDIDATE 
+@app.route("/deleteCandidate", methods=["GET", "POST"])
+def delete_candidate():
+ 
+    if request.method == "GET":
+        candidates = db.session.query(
+            CandidateModel.id,
+            CandidateModel.name,
+            CandidateModel.email
+        )
+        return render_template("/listCandidates.html", candidates=candidates)
     if request.method == "POST":
-        if question:
-            db.session.delete(question)
+        candidateToDelete = request.form["candidateToDelete"]
+        print(f"candidate to delete is {candidateToDelete}")
+        candidateToDelete2 = int(candidateToDelete)
+        delete_me = CandidateModel.query.filter(CandidateModel.id==candidateToDelete).first()
+        if delete_me:
+            db.session.delete(delete_me)
             db.session.commit()
-            return redirect("/candidates")
+            flash("You have deleted the selected Candidate.")
+            return redirect("/employer")
         abort(404)
-    return render_template("delete.html")
-
+   
 
 # register_user route.
 #  simple user registration.
