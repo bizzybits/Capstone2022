@@ -1,0 +1,57 @@
+{% extends "layouts/main.html" %}
+
+{% block content%}
+
+<style>
+    .container ul {
+        padding: 0;
+        /* remove default padding and all margins! */
+        margin: 0;
+        list-style-type: none;
+        /* remove the • */
+    }
+
+    .container ul li {
+        margin-left: 100px;
+        width: 150px;
+        height: 100px;
+        float: left;
+    }
+
+    .container ul {
+        display: listitem;
+    }
+</style>
+<!-- <div>
+    Select Candidate to Update
+    <SELECT name="candidateToUpdate">
+
+        {% for candidate in candidates %}
+        <div class="container"></div>
+
+        <OPTION value={{candidate.id}}>{{candidate.name}}</OPTION>
+
+        {% endfor %}
+    </SELECT>
+</div>
+<form id="candidateToUpdate" name="candidateToUpdate" method="POST"
+    action="{{ url_for('edit_candidate', candidateToUpdate=candidateToUpdate) }}">
+    <button type="submit">Edit Candidate</button>
+</form> -->
+
+<h2>Update a Candidate</h2>
+
+<form action="{{ url_for('edit_candidate', candidateToUpdate=candidateToUpdate) }}">
+    <label for="candidateToUpdate">Select a Candidate to Update:</label>
+    <select id="candidateToUpdate" name="candidateToUpdate">
+        {% for candidate in candidates %}
+
+
+        <OPTION value={{candidate.id}}>{{candidate.name}}</OPTION>
+
+        {% endfor %}
+    </select>
+    <input type="submit">
+</form>
+
+{% endblock %}

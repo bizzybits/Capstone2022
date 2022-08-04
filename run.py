@@ -504,6 +504,35 @@ def delete_candidate():
             return redirect("/employer")
         abort(404)
    
+# UPDATE CANDIDATE 
+@app.route("/updateCandidate", methods=["GET"])
+def update_candidate():
+ 
+    if request.method == "GET":
+        candidates = db.session.query(
+            CandidateModel.id,
+            CandidateModel.name,
+            CandidateModel.email
+        )
+        return render_template("/editCandidate.html", candidates=candidates) #update candadiatl html and list of candidates
+
+@app.route("/editCandidate", methods=["GET","POST"])
+def edit_candidate():
+    candidateToUpdate = request.form["candidateToUpdate"]
+    print(f"candidate to update is {candidateToUpdate}")
+    update_me = CandidateModel.query.filter(CandidateModel.id==candidateToUpdate).first()
+    
+    if update_me:
+        render_template("/updateHere.html", candidateToUpdate=candidateToUpdate)
+        candidateToUpdate = CandidateModel.query.filter(CandidateModel.id==candidateToUpdate).first()
+        candidateToUpdate.name = request.form["candidate_name"]
+        candidateToUpdate.email = request.form["candidate_email"]
+        db.session.commit()
+        flash("You have updated the selected Candidate.")
+        return redirect("/employer")
+
+    abort(404)
+
 
 # register_user route.
 # user registration.
