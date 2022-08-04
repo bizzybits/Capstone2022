@@ -1,3 +1,4 @@
+import re
 from models import (
     db,
     QuestionModel,
@@ -505,17 +506,25 @@ def delete_candidate():
         abort(404)
    
 # UPDATE CANDIDATE 
-@app.route("/updateCandidate", methods=["GET"])
+@app.route("/updateCandidate", methods=["GET","POST"])
 def update_candidate():
  
-    if request.method == "GET":
+    if request.method == "GET": # Screen for Employer to select candidate
         candidates = db.session.query(
             CandidateModel.id,
             CandidateModel.name,
             CandidateModel.email
         )
-        return render_template("/editCandidate.html", candidates=candidates) #update candadiatl html and list of candidates
-
+        return render_template("/updateCandidate.html", candidates=candidates) #update candadiatl html and list of candidates
+    elif request.method == "POST": # Employer has selected candidate
+        candidate_id = request.form["candidateToUpdate"]
+        candidate = db.session.query(
+            CandidateModel.id,
+            CandidateModel.name,
+            CandidateModel.email
+        ).filter(CandidateModel.id==candidate_id).first()
+        print(candidate)
+        return render_template("/editCandidate.html", candidateToUpdate=candidate) #update candadiatl html and list of candidates
 @app.route("/editCandidate", methods=["GET","POST"])
 def edit_candidate():
     candidateToUpdate = request.form["candidateToUpdate"]
@@ -569,7 +578,8 @@ def get(id):
 def employer_login_():
     if request.method == "GET":
         return render_template('emp_login.html')
-    if request.method == "POST":
+    if request.method == "POST": # works
+        print(request.form)
         email = request.form['email']
         password = request.form['password']
         employer = Employer.query.filter_by(email=email).first()
@@ -580,20 +590,21 @@ def employer_login_():
             flash("No User with those credentials, please register.", "error")
             return redirect('/signup')
 
-@app.route('/signup',methods=['GET','POST'])
+@app.route("/signup",methods=["GET","POST"])
 def emp_signup():
     if request.method == "GET":
         return render_template('emp_signup.html')
-    if request.method == "POST":
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
+    if request.method == "POST": #BadKeyError
+        print(request.form)
+        username = request.form["username"]
+        email = request.form["email"]
+        password = request.form["password"]
         employer = Employer(username=username,email=email,password=password)
         db.session.add(employer)
         db.session.commit()
         employer = Employer.query.filter_by(email=email).first()
         login_user(employer)
-        return redirect('/login')
+        return redirect("/login")
 
 @app.route('/logout',methods=['GET'])
 def logout():

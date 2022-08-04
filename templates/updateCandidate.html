@@ -39,20 +39,11 @@
     <button type="submit">Edit Candidate</button>
 </form> -->
 
-<form action="{{ url_for('update_candidate', candidateToUpdate=candidateToUpdate) }} method=" POST">
-    <p>Update {{candidateToUpdate.name}}'s Name <input type="text" name="candidate_name"
-            value="{{candidateToUpdate.name}}" />
-    </p>
-    <p>Update {{candidateToUpdate.name}}'s Email <input type="text" name="candidate_email"
-            value="{{candidateToUpdate.email}}" /></p>
-    <p><input type="submit" value="Submit" /></p>
-</form>
+<h2>Update a Candidate</h2>
 
-<!-- <h2>Update a Candidate</h2>
-
-<form action="{{ url_for('edit_candidate', candidateToUpdate=candidateToUpdate) }}">
+<form action="{{ url_for('update_candidate') }}" method="POST" class="form-group">
     <label for="candidateToUpdate">Select a Candidate to Update:</label>
-    <select id="candidateToUpdate" name="candidateToUpdate">
+    <select id="candidateToUpdate" name="candidateToUpdate" class="form-group">
         {% for candidate in candidates %}
 
 
@@ -61,6 +52,6 @@
         {% endfor %}
     </select>
     <input type="submit">
-</form> -->
+</form>
 
 {% endblock %}
