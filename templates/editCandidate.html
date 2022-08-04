@@ -22,45 +22,17 @@
         display: listitem;
     }
 </style>
-<!-- <div>
-    Select Candidate to Update
-    <SELECT name="candidateToUpdate">
 
-        {% for candidate in candidates %}
-        <div class="container"></div>
-
-        <OPTION value={{candidate.id}}>{{candidate.name}}</OPTION>
-
-        {% endfor %}
-    </SELECT>
-</div>
-<form id="candidateToUpdate" name="candidateToUpdate" method="POST"
-    action="{{ url_for('edit_candidate', candidateToUpdate=candidateToUpdate) }}">
-    <button type="submit">Edit Candidate</button>
-</form> -->
-
-<form action="{{ url_for('update_candidate', candidateToUpdate=candidateToUpdate) }} method=" POST">
+<form action="{{ url_for('edit_candidate') }}" method="POST">
     <p>Update {{candidateToUpdate.name}}'s Name <input type="text" name="candidate_name"
             value="{{candidateToUpdate.name}}" />
     </p>
     <p>Update {{candidateToUpdate.name}}'s Email <input type="text" name="candidate_email"
             value="{{candidateToUpdate.email}}" /></p>
-    <p><input type="submit" value="Submit" /></p>
+    <p><input type="submit" name="submit" value="Submit" /></p>
+
+</form>
 </form>
 
-<!-- <h2>Update a Candidate</h2>
-
-<form action="{{ url_for('edit_candidate', candidateToUpdate=candidateToUpdate) }}">
-    <label for="candidateToUpdate">Select a Candidate to Update:</label>
-    <select id="candidateToUpdate" name="candidateToUpdate">
-        {% for candidate in candidates %}
-
-
-        <OPTION value={{candidate.id}}>{{candidate.name}}</OPTION>
-
-        {% endfor %}
-    </select>
-    <input type="submit">
-</form> -->
 
 {% endblock %}

@@ -525,20 +525,28 @@ def update_candidate():
         ).filter(CandidateModel.id==candidate_id).first()
         print(candidate)
         return render_template("/editCandidate.html", candidateToUpdate=candidate) #update candadiatl html and list of candidates
+
+
 @app.route("/editCandidate", methods=["GET","POST"])
 def edit_candidate():
-    candidateToUpdate = request.form["candidateToUpdate"]
-    print(f"candidate to update is {candidateToUpdate}")
-    update_me = CandidateModel.query.filter(CandidateModel.id==candidateToUpdate).first()
-    
-    if update_me:
-        render_template("/updateHere.html", candidateToUpdate=candidateToUpdate)
-        candidateToUpdate = CandidateModel.query.filter(CandidateModel.id==candidateToUpdate).first()
-        candidateToUpdate.name = request.form["candidate_name"]
-        candidateToUpdate.email = request.form["candidate_email"]
-        db.session.commit()
-        flash("You have updated the selected Candidate.")
-        return redirect("/employer")
+    if request.method == "GET":
+        candidate_id = request.form["candidateToUpdate"]
+        candidate = db.session.query(
+            CandidateModel.id,
+            CandidateModel.name,
+            CandidateModel.email
+        ).filter(CandidateModel.id==candidate_id).first()
+        return render_template("/editCandidate.html", candidateToUpdate=candidate)
+    if request.method == "POST":
+        candidate_name = request.form["candidate_name"]
+        update_me = CandidateModel.query.filter(CandidateModel.name==candidate_name).first()
+        if update_me:
+            candidateToUpdate = CandidateModel.query.filter(CandidateModel.name==candidate_name).first()
+            candidateToUpdate.name = request.form["candidate_name"]
+            candidateToUpdate.email = request.form["candidate_email"]
+            db.session.commit()
+            flash("You have updated the selected Candidate.")
+            return redirect("/employer")
 
     abort(404)
 
