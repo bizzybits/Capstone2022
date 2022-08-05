@@ -7,7 +7,14 @@ db = SQLAlchemy()
 
 
 class Employer(UserMixin,db.Model):
-    id = db.Column(db.Integer,primary_key=True,autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True,autoincrement=True)
+    username = db.Column(db.String(200))
+    email = db.Column(db.String(200))
+    password = db.Column(db.String(200))
+
+
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(200))
     email = db.Column(db.String(200))
     password = db.Column(db.String(200))
@@ -24,14 +31,18 @@ class Quiz(db.Model):
     candidate_id = db.Column(db.Integer, db.ForeignKey("candidates.id"))
     email_sent = db.Column(db.Boolean)
     completed = db.Column(db.Boolean)
+    time_limit = db.Column(db.Integer)
     # Quizzes HAS MANY questions.
     # Candidate connectionhi
 
-    def __init__(self, candidate_id, key, completed=0, email_sent=0):
+    def __init__(self, candidate_id, key, completed=0, email_sent=0,
+                 time_limit=6):
         self.candidate_id = candidate_id
         self.completed = completed
         self.email_sent = email_sent
         self.key = key  # self.completed = done
+        self.time_limit = time_limit  # in minutes, default is 6 minutes.
+        # TODO: Need to capture Quiz Time as allowed by Employer
 
     def __repr__(self):
         return f"{self.id}:{self.candidate_id}:{self.completed}"

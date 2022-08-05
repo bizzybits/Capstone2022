@@ -9,6 +9,7 @@
 
 <!--USE FOR Notifying user politely what went wrong-->
 <div>
+    <label>Candidate:
     <select form="makeQuiz" id='candidate' name="candidate">
         {% if candidates|length > 0 %}
         {% for candidate in candidates %}
@@ -18,6 +19,10 @@
         <option value="*">No candidates registered</option>
         {% endif %}
     </select>
+</label>
+<label>Time Limit (In minutes)
+    <input form="makeQuiz" id="timeLimit" name="timeLimit" value="6" min="0"/>
+</label>
 </div>
 
 <form id="makeQuiz" name="makeQuiz" action="{{ url_for('quiz') }}" method="POST">
@@ -35,6 +40,7 @@
             <th>Candidate Name</th>
             <th>Candidate Email</th>
             <th>Completed?</th>
+            <th>Time Limit (in minutes)</th>
             <th>Email Sent</th>
             <th>Status</th>
         </tr>
@@ -48,11 +54,14 @@
             <td>{{ quiz[1].name }}</td>
             <td>{{ quiz[1].email }}</td>
             <td>{{ quiz[0].completed }}</td>
+            <td>{{ quiz[0].time_limit }} Minutes</td>
             <td>{{ quiz[0].email_sent }}</td>
             <td>
                 {% if quiz[0].email_sent %}
                 <span>Quiz sent to Candidate</span>
                 {% else %}
+                <!--   TODO: Allow for quiz time selection-->
+                <!--   TODO: Add quiz time to quiz table record-->
                 <a class="btn btn-success"
                     href="{{ url_for('RetrieveQuestionsList', quiz_id=quiz[0].id, candidate_id=quiz[1].id) }}">Add
                     Questions</a>

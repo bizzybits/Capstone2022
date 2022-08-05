@@ -1,4 +1,4 @@
-import re
+
 from models import (
     db,
     QuestionModel,
@@ -9,7 +9,8 @@ from models import (
     CandidateModel,
     QuizQuestions,
     QuizResults,
-    Employer
+    Employer,
+    User
 )
 import bs4 as bs
 from flask import Flask, render_template, request, redirect, url_for, flash, abort
@@ -249,6 +250,7 @@ def quiz():
         )
     elif request.method == "POST":
         candidate_id = request.form["candidate"]
+        time_limit = request.form['timeLimit']
         if candidate_id == "*":
             flash("There are no candidates registered.")
             abort(422)
@@ -257,7 +259,7 @@ def quiz():
             CandidateModel.id == candidate_id
         ).first()
         print(candidate)
-        new_quiz = Quiz(candidate_id=candidate.id, key=genKey())
+        new_quiz = Quiz(candidate_id=candidate.id, key=genKey(), time_limit=time_limit)
         db.session.add(new_quiz)
         db.session.commit()
         flash(f"Successfully created a quiz for {candidate.name}")
@@ -326,20 +328,18 @@ def add_questions(candidate_id, quiz_id):
 def retrieve_quiz():
     if request.method == "GET":
         return render_template("take_quiz.html")
-
     elif request.method == "POST":
         candidate_email = request.form["email"]
         quiz_key = request.form["key"]
         quiz_match = Quiz.query.filter(Quiz.key == quiz_key).first()
-
         candidate = CandidateModel.query.filter(
             CandidateModel.email == candidate_email
         ).first()
-
         if not candidate:
+            flash("404: Candidate not found.")
             return abort(404)
-
         if not quiz_match:
+            flash("404: quiz not found.")
             return abort(404)
 
         questions = (
@@ -383,8 +383,10 @@ def retrieve_quiz():
 
 
 # process_quiz route.
-#  grabs questions for a given quiz; compares known answer to given answers. 
-#  Marks the matching quiz to completed.
+# grabs questions for a given quiz; compares known answer to given answers. Marks the matching quiz to completed.
+# TODO: add scoring
+# TODO: email score to candidate.
+# TODO: store general results in db. {QuizResults}
 @app.route("/candidate/<int:candidate_id>/quiz/<int:quiz_id>/answers", methods=["POST"])
 def process_quiz(candidate_id, quiz_id):
     questions = (
@@ -413,21 +415,31 @@ def process_quiz(candidate_id, quiz_id):
     for question in questions:
         form_answer = request.form[str(question.id)]
         correct = form_answer == question.answer
+        print(form_answer)
+        print(question.answer)
 
         if correct:
             print(f"You got {question.id} correct")
             right += 1
             total_questions += 1
+            print(right)
 
         else:
             print(f"You got {question.id} wrong")
             wrong += 1
             total_questions += 1
+            print(wrong)
 
+    print(f"total correct, {right}")
+    print(f"total incorrect, {wrong}")
+    print(f"total questions, {total_questions}")
     # after processing the answers of the quiz, mark the quiz as completed.
     quiz_match = Quiz.query.filter(Quiz.id == quiz_id).first()
 
     quiz_match.completed = True
+    print(f"quiz match id is {quiz_match.id}")
+    print(f"quiz id is {quiz_id}")
+    print(f"candidate id is {candidate_id}")
 
     score = right / total_questions
     new_results = QuizResults(quiz_id, candidate_id, right, wrong, time_elapsed, score)
@@ -437,7 +449,7 @@ def process_quiz(candidate_id, quiz_id):
     score = new_results.score
     new_results.quiz_id = quiz_match.id
     new_results.candidate_id = candidate_id
-   
+
     db.session.add(new_results)
     db.session.commit()
 
@@ -452,12 +464,16 @@ def process_quiz(candidate_id, quiz_id):
 def get_results_for_candidate():
     if request.method == "GET":
         return render_template("results.html")
-
     elif request.method == "POST":
         quiz_key = request.form["key"]
+        print(f"results1 = {quiz_key}")
         quiz_result = Quiz.query.filter(Quiz.key == quiz_key).first()
         cand_result = QuizResults.query.filter(QuizResults.quiz_id == quiz_result.id).first()
         candidate = CandidateModel.query.filter(CandidateModel.id == cand_result.candidate_id).first()
+        print(f"lala {candidate.name}")
+        if quiz_result:
+            print(f"do_this = {quiz_result.id}")
+            print(f"candidate result for quiz id is{cand_result} ")
         if not quiz_result:
             return abort(404)
         return render_template("candidate_results.html", cand_result=cand_result, candidate=candidate)
