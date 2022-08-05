@@ -3,6 +3,7 @@
 {% block content%}
 <div>
     <h1>Hi, {{ candidate.name }} Here is your quiz.</h1>
+<!--    TODO: Need to add display of Time Allowed from Employer for this quiz-->
     <div>You have <span id="timer">1:00 </span> Minute Left</div>
     {% if questions %}
     <form id="quiz" name="quiz" method="POST"
@@ -44,7 +45,7 @@
     const quizForm = document.getElementById('quiz');
     const timerDisplay = document.getElementById('timer');
     const tracker = document.getElementById('tracker');
-    const TIME_LIMIT = 1 * 60; // minutes * seconds/min
+    const TIME_LIMIT = parseInt("{{ quiz.time_limit }}") * 60; // minutes * seconds/min
     let timeLeft = TIME_LIMIT;
     let timeTaken = 0;
     const timer = setInterval(() => {
