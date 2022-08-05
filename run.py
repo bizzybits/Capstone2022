@@ -579,9 +579,6 @@ def register_user():
         flash("User successfully registered", "success")
         return redirect(url_for("candidates"))
 
-login_manager = LoginManager()
-login_manager.init_app(app)
-
 @login_manager.user_loader
 def get(id):
     return Employer.query.get(id)
@@ -591,8 +588,7 @@ def get(id):
 def employer_login_():
     if request.method == "GET":
         return render_template('emp_login.html')
-    if request.method == "POST": # works
-        print(request.form)
+    if request.method == "POST": 
         email = request.form['email']
         password = request.form['password']
         employer = Employer.query.filter_by(email=email).first()
@@ -600,15 +596,14 @@ def employer_login_():
             login_user(employer)
             return redirect('/employer')
         else:
-            flash("No User with those credentials, please register.", "error")
+            flash("No user with those credentials, please register.", "error")
             return redirect('/signup')
 
 @app.route("/signup",methods=["GET","POST"])
 def emp_signup():
     if request.method == "GET":
-        return render_template('emp_signup.html')
-    if request.method == "POST": #BadKeyError
-        print(request.form)
+        return render_template("emp_signup.html")
+    if request.method == "POST": 
         username = request.form["username"]
         email = request.form["email"]
         password = request.form["password"]
