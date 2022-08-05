@@ -550,7 +550,7 @@ def edit_candidate():
             candidateToUpdate.name = request.form["candidate_name"]
             candidateToUpdate.email = request.form["candidate_email"]
             db.session.commit()
-            flash("You have updated the selected Candidate's Email Address.")
+            flash("You have updated the selected Candidate's Information.")
             return redirect("/employer")
 
         abort(404)
