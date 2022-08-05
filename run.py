@@ -1,3 +1,4 @@
+import re
 from models import (
     db,
     QuestionModel,
@@ -10,6 +11,7 @@ from models import (
     QuizResults,
     Employer
 )
+import bs4 as bs
 from flask import Flask, render_template, request, redirect, url_for, flash, abort
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 import os
@@ -19,6 +21,8 @@ from flask_mail import Mail, Message
 import html
 import time
 from sqlalchemy.sql.expression import func
+
+
 
 # Launch FLASK app
 app = Flask(__name__)
@@ -504,6 +508,53 @@ def delete_candidate():
             return redirect("/employer")
         abort(404)
    
+# UPDATE CANDIDATE 
+@app.route("/updateCandidate", methods=["GET","POST"])
+def update_candidate():
+ 
+    if request.method == "GET": # Screen for Employer to select candidate
+        candidates = db.session.query(
+            CandidateModel.id,
+            CandidateModel.name,
+            CandidateModel.email
+        )
+        return render_template("/updateCandidate.html", candidates=candidates) #update candadiatl html and list of candidates
+    elif request.method == "POST": # Employer has selected candidate
+        candidate_id = request.form["candidateToUpdate"]
+        candidate = db.session.query(
+            CandidateModel.id,
+            CandidateModel.name,
+            CandidateModel.email
+        ).filter(CandidateModel.id==candidate_id).first()
+        return render_template("/editCandidate.html", candidateToUpdate=candidate) #update candadiatl html and list of candidates
+
+
+@app.route("/editCandidate", methods=["GET","POST"])
+def edit_candidate():
+    if request.method == "GET":
+        candidate_id = request.form["candidateToUpdate"]
+        candidate = db.session.query(
+            CandidateModel.id,
+            CandidateModel.name,
+            CandidateModel.email
+        ).filter(CandidateModel.id==candidate_id).first()
+        return render_template("/editCandidate.html", candidateToUpdate=candidate)
+    if request.method == "POST":
+       
+        candidate_id = request.form["candidate_id"]
+      
+        update_me = CandidateModel.query.filter(CandidateModel.id==candidate_id).first()
+        if update_me:
+           
+            candidateToUpdate = CandidateModel.query.filter(CandidateModel.id==update_me.id).first()
+            candidateToUpdate.name = request.form["candidate_name"]
+            candidateToUpdate.email = request.form["candidate_email"]
+            db.session.commit()
+            flash("You have updated the selected Candidate's Information.")
+            return redirect("/employer")
+
+        abort(404)
+
 
 # register_user route.
 # user registration.
@@ -540,7 +591,8 @@ def get(id):
 def employer_login_():
     if request.method == "GET":
         return render_template('emp_login.html')
-    if request.method == "POST":
+    if request.method == "POST": # works
+        print(request.form)
         email = request.form['email']
         password = request.form['password']
         employer = Employer.query.filter_by(email=email).first()
@@ -551,20 +603,21 @@ def employer_login_():
             flash("No User with those credentials, please register.", "error")
             return redirect('/signup')
 
-@app.route('/signup',methods=['GET','POST'])
+@app.route("/signup",methods=["GET","POST"])
 def emp_signup():
     if request.method == "GET":
         return render_template('emp_signup.html')
-    if request.method == "POST":
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
+    if request.method == "POST": #BadKeyError
+        print(request.form)
+        username = request.form["username"]
+        email = request.form["email"]
+        password = request.form["password"]
         employer = Employer(username=username,email=email,password=password)
         db.session.add(employer)
         db.session.commit()
         employer = Employer.query.filter_by(email=email).first()
         login_user(employer)
-        return redirect('/login')
+        return redirect("/login")
 
 @app.route('/logout',methods=['GET'])
 def logout():
