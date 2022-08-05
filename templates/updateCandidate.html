@@ -22,24 +22,9 @@
         display: listitem;
     }
 </style>
-<!-- <div>
-    Select Candidate to Update
-    <SELECT name="candidateToUpdate">
 
-        {% for candidate in candidates %}
-        <div class="container"></div>
 
-        <OPTION value={{candidate.id}}>{{candidate.name}}</OPTION>
-
-        {% endfor %}
-    </SELECT>
-</div>
-<form id="candidateToUpdate" name="candidateToUpdate" method="POST"
-    action="{{ url_for('edit_candidate', candidateToUpdate=candidateToUpdate) }}">
-    <button type="submit">Edit Candidate</button>
-</form> -->
-
-<h2>Update a Candidate</h2>
+<h2>Update a Candidate's Email Address</h2>
 
 <form action="{{ url_for('update_candidate') }}" method="POST" class="form-group">
     <label for="candidateToUpdate">Select a Candidate to Update:</label>
