@@ -156,10 +156,12 @@ def index():
 #  displays image template.
 @app.route("/about")
 def about():
-    greetings = """QUIZLET from OSU...
-    This app is expressly for the purpose of getting an A
-    in our Capstone Project"""
-    detail = " Please Vote with your usage.... the more hits the better...."
+    greetings = """This app is expressly for the purpose Oregon State University's Capstone 
+    Project"""
+    detail = "Team members, Elizabeth Ponce & Andrea Hamilton are both local " \
+             "to Portland, Oregon. Elizabeth works as a System Engineer at " \
+             "Airbnb. Andrea works as a Technical Project Manager at Network Redux." \
+             "They both enjoy learning new technologies and enjoying all that Portland has to offer."
     sketch = "static/images/brooke-cagle-g1Kr4Ozfoac-unsplash.jpg"
 
     return render_template(
@@ -173,7 +175,7 @@ def about():
 def help():
     greetings = """...HELP, HELP, HELP..."""
 
-    detail = "All the help you will ever need"
+    detail = "All the help you will ever need. Page under construction."
     sketch = "static/images/lasse-jensen-mPr2sCjuKAo-unsplash.jpg"
 
     return render_template(
@@ -187,9 +189,10 @@ def help():
 def contact():
     greetings = """...CONTACT..."""
 
-    detail = "All the touch you will ever need"
+    detail = "All the contact you will ever need. Page under construction"
+    sketch = "static/images/lasse-jensen-mPr2sCjuKAo-unsplash.jpg"
 
-    return render_template("image.html", greetings=greetings, detail=detail)
+    return render_template("image.html", greetings=greetings, detail=detail, image=sketch)
 
 
 # candidates route.
