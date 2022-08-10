@@ -28,7 +28,7 @@ class Quiz(db.Model):
     __tablename__ = "quizzes"
     id = db.Column(db.Integer, primary_key=True)
     key = db.Column(db.Integer, unique=True)
-    candidate_id = db.Column(db.Integer, db.ForeignKey("candidates.id"))
+    candidate_id = db.Column(db.Integer, db.ForeignKey("candidates.id", ondelete="CASCADE"))
     email_sent = db.Column(db.Boolean)
     completed = db.Column(db.Boolean)
     time_limit = db.Column(db.Integer)
