@@ -1,18 +1,20 @@
 {% extends "layouts/main.html" %}
 {% block content%}
 
-<div>Here are the results for {{ candidate.name }} who took quiz {{cand_result.quiz_id}} Thank you.</div>
+<div>
+    <h3>Here are the results for {{ candidate.name }} who took quiz {{quiz_for_candidate.quiz_id}} Thank you.</h3>
+</div>
 
-<h3>Candidate Name: {{ candidate.name }}</h3>
-<h3>Candidate ID: {{ candidate.id }}</h3>
-<h3>Candidate Email: {{ candidate.email }}</h3>
-<h3>Quiz ID: {{ cand_result.quiz_id }}</h3>
-<h3>NUMBER CORRECT: {{ cand_result.total_correct }}</h3>
-<h3>NUMBER INCORRECT: {{ cand_result.total_incorrect }}</h3>
-<h3>TOTAL SCORE: {{ '%0.2f' |format(result.score * 100|float) }}</h3>
+<h4>Candidate Name: {{ candidate.name }}</h4>
+<h4>Candidate ID: {{ candidate.id }}</h4>
+<h4>Candidate Email: {{ candidate.email }}</h4>
+<h4>Quiz ID: {{ quiz_for_candidate.quiz_id }}</h4>
+<h4>NUMBER CORRECT: {{ quiz_for_candidate.total_correct }}</h4>
+<h4>NUMBER INCORRECT: {{ quiz_for_candidate.total_incorrect }}</h4>
+<h4>TOTAL SCORE: {{ '%0.2f' |format(quiz_for_candidate.score * 100|float) }}</h4>
 <div><br>
     <form>
-        <input type="button" value="Employer Home" onclick="history.back()">
+        <input type="button" value="Back" onclick="history.back()">
     </form>
 </div>
 {% endblock %}

@@ -3,23 +3,29 @@
 {% block content%}
 
 <div>
-    <h4>Please enter Quiz Key to view a Candidate's Results.
+    <h4>Please Select a Candidate to view their results.
 </div>
 </div>
 <div class="container">
     <div class="row">
         <div class="col-lg-3 col-md-3 col-sm-12"></div>
         <div class="col-lg-6 col-md-6 col-sm-12 myblock">
-            <form id="results" name="results" method="POST" action="{{ url_for('get_results_for_candidate') }}">
-                <label>
-                    Quiz Key:
-                    <input type="text" name="key" id="key" />
-                </label>
-        </div>
 
-        <div class="col-lg-3 col-md-3 col-sm-12"></div>
+        </div>
+        <form action="{{ url_for('get_results_for_candidate') }}" method="POST" class="form-group">
+            <select id="name" name="name" class="form-group">
+                {% for candidate in candidates %}
+
+
+                <OPTION value={{candidate.id}}>{{candidate.name}}</OPTION>
+
+                {% endfor %}
+            </select>
+            <button type="submit">Get Candidate Results</button>
+
+            <div class="col-lg-3 col-md-3 col-sm-12"></div>
     </div>
-    <button type="submit">Get Candidate Results</button>
+
     <input type="button" value="Employer Home" onclick="history.back()">
     </form>
     {% endblock %}
