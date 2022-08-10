@@ -28,13 +28,10 @@
             <tr>
                 {% for candidate in candidates %}
             <tr>
-                <br>
                 <td><input form="candidateToDelete" type="radio" name="candidateToDelete" value="{{candidate.id}}" />
                 </td>
                 <td style="text-align:right">{{candidate.id}}</td>
-                <br>
                 <td style="text-align:right">{{candidate.name}}</td>
-                <br>
                 <td style="text-align:right">{{candidate.email}}</td>
             </tr>
             {% endfor %}
