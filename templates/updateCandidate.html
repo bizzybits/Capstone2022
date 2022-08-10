@@ -2,26 +2,6 @@
 
 {% block content%}
 
-<style>
-    .container ul {
-        padding: 0;
-        /* remove default padding and all margins! */
-        margin: 0;
-        list-style-type: none;
-        /* remove the • */
-    }
-
-    .container ul li {
-        margin-left: 100px;
-        width: 150px;
-        height: 100px;
-        float: left;
-    }
-
-    .container ul {
-        display: listitem;
-    }
-</style>
 
 
 <h2>Update a Candidate's Information</h2>
@@ -37,6 +17,12 @@
         {% endfor %}
     </select>
     <input type="submit">
+
+    <br>
+    <br>
+    <input type="button" value="Employer Home" onclick="history.back()">
 </form>
+
+
 
 {% endblock %}

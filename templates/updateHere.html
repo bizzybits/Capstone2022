@@ -1,8 +1,11 @@
 <form action="{{ url_for('update_candidate', candidateToUpdate=candidateToUpdate) }} method=" POST">
-    <p>Update {{candidateToUpdate.name}}'s Name <input type="text" name="candidate_name"
-            value="{{candidateToUpdate.name}}" />
-    </p>
-    <p>Update {{candidateToUpdate.name}}'s Email <input type="text" name="candidate_email"
-            value="{{candidateToUpdate.email}}" /></p>
-    <p><input type="submit" value="Submit" /></p>
+        <p>Update {{candidateToUpdate.name}}'s Name <input type="text" name="candidate_name"
+                        value="{{candidateToUpdate.name}}" />
+        </p>
+        <p>Update {{candidateToUpdate.name}}'s Email <input type="text" name="candidate_email"
+                        value="{{candidateToUpdate.email}}" /></p>
+        <p><input type="submit" value="Submit" /></p>
+        <br>
+        <input type="button" value="Employer Home" onclick="history.back()">
+
 </form>

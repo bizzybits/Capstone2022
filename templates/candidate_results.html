@@ -9,6 +9,10 @@
 <h3>Quiz ID: {{ cand_result.quiz_id }}</h3>
 <h3>NUMBER CORRECT: {{ cand_result.total_correct }}</h3>
 <h3>NUMBER INCORRECT: {{ cand_result.total_incorrect }}</h3>
-<h3>TOTAL SCORE: {{ cand_result.score * 100 }}</h3>
-
+<h3>TOTAL SCORE: {{ '%0.2f' |format(result.score * 100|float) }}</h3>
+<div><br>
+    <form>
+        <input type="button" value="Employer Home" onclick="history.back()">
+    </form>
+</div>
 {% endblock %}

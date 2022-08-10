@@ -23,7 +23,7 @@
     }
 </style>
 <div>
-    Select Candidate to Delete
+    <h2>Select Candidate to Delete</h2>
 </div>
 {% for candidate in candidates %}
 <div class="container"></div>
@@ -38,10 +38,14 @@
     </ul>
 </tr>
 <br>
+<br>
 {% endfor %}
+<br>
 <form id="candidateToDelete" name="candidateToDelete" method="POST"
     action="{{ url_for('delete_candidate', candidateToDelete=candidateToDelete) }}">
     <button type="submit">Delete Candidate</button>
+    <input type="button" value="Employer Home" onclick="history.back()">
+
 </form>
 
 {% endblock %}

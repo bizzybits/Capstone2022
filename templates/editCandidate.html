@@ -21,6 +21,16 @@
     .container ul {
         display: listitem;
     }
+
+    .button {
+        transition-duration: 0.4s;
+    }
+
+    .button:hover {
+        background-color: #4CAF50;
+        /* Green */
+        color: white;
+    }
 </style>
 
 <form action="{{ url_for('edit_candidate') }}" method="POST">
@@ -34,10 +44,11 @@
     </p>
     <p>Update {{candidateToUpdate.name}}'s Email <input type="text" name="candidate_email"
             value="{{candidateToUpdate.email}}" /></p>
-    <p><input type="submit" name="submit" value="Submit" id="{{candidateToUpdate.id}} /></p>
+    <p><input type="submit" name="submit" value="Submit" id="{{candidateToUpdate.id}} " /></p>
+    <br>
+    <input type="button" value="Back" onclick="history.back()">
 
 </form>
-
 
 
 

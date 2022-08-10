@@ -10,19 +10,19 @@
 <!--USE FOR Notifying user politely what went wrong-->
 <div>
     <label>Candidate:
-    <select form="makeQuiz" id='candidate' name="candidate">
-        {% if candidates|length > 0 %}
-        {% for candidate in candidates %}
-        <option value="{{ candidate.id }}">{{ candidate.email }}</option>
-        {% endfor %}
-        {% else %}
-        <option value="*">No candidates registered</option>
-        {% endif %}
-    </select>
-</label>
-<label>Time Limit (In minutes)
-    <input form="makeQuiz" id="timeLimit" name="timeLimit" value="6" min="0"/>
-</label>
+        <select form="makeQuiz" id='candidate' name="candidate">
+            {% if candidates|length > 0 %}
+            {% for candidate in candidates %}
+            <option value="{{ candidate.id }}">{{ candidate.email }}</option>
+            {% endfor %}
+            {% else %}
+            <option value="*">No candidates registered</option>
+            {% endif %}
+        </select>
+    </label>
+    <label>Time Limit (In minutes)
+        <input form="makeQuiz" id="timeLimit" name="timeLimit" value="6" min="0" />
+    </label>
 </div>
 
 <form id="makeQuiz" name="makeQuiz" action="{{ url_for('quiz') }}" method="POST">
@@ -78,7 +78,7 @@
     </tbody>
 </table>
 
-
+<input type="button" value="Employer Home" onclick="history.back()">
 </body>
 
 {% endblock %}
