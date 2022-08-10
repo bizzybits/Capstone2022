@@ -466,20 +466,26 @@ def process_quiz(candidate_id, quiz_id):
 @app.route("/results", methods=["GET", "POST"])
 def get_results_for_candidate():
     if request.method == "GET":
-        return render_template("results.html")
+        if request.method == "GET": # Screen for Employer to select candidate
+            candidates = db.session.query(
+                CandidateModel.id,
+                CandidateModel.name,
+                CandidateModel.email
+            )
+        return render_template("results.html", candidates=candidates)
     elif request.method == "POST":
-        quiz_key = request.form["key"]
-        print(f"results1 = {quiz_key}")
-        quiz_result = Quiz.query.filter(Quiz.key == quiz_key).first()
-        cand_result = QuizResults.query.filter(QuizResults.quiz_id == quiz_result.id).first()
-        candidate = CandidateModel.query.filter(CandidateModel.id == cand_result.candidate_id).first()
-        print(f"lala {candidate.name}")
-        if quiz_result:
-            print(f"do_this = {quiz_result.id}")
-            print(f"candidate result for quiz id is{cand_result} ")
-        if not quiz_result:
+        candidate_id = request.form["name"]
+        print(f"candidate_id = {candidate_id}")
+        candidate = CandidateModel.query.filter(CandidateModel.id == candidate_id).first()
+        print(f"candidate = {candidate.id}")
+        quiz_for_candidate = QuizResults.query.filter(QuizResults.candidate_id == candidate.id).first()
+        print(f"lala {quiz_for_candidate}")
+        if quiz_for_candidate:
+            print(f"do_this = {quiz_for_candidate}")
+            print(f"candidate result for quiz id is{quiz_for_candidate.candidate_id} ")
+        if not quiz_for_candidate:
             return abort(404)
-        return render_template("candidate_results.html", cand_result=cand_result, candidate=candidate)
+        return render_template("candidate_results.html", quiz_for_candidate=quiz_for_candidate, candidate=candidate)
 
 
 @app.route("/allresults", methods=["GET"])
