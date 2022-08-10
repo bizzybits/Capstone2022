@@ -3,43 +3,47 @@
 {% block content%}
 
 <style>
-    .container ul {
-        padding: 0;
-        /* remove default padding and all margins! */
-        margin: 0;
-        list-style-type: none;
-        /* remove the • */
-    }
-
-    .container ul li {
-        margin-left: 100px;
-        width: 150px;
-        height: 100px;
-        float: left;
-    }
-
-    .container ul {
-        display: listitem;
+    .container th,
+    tr {
+        text-align: left;
+        grid-template-rows: auto;
     }
 </style>
 <div>
     <h2>Select Candidate to Delete</h2>
 </div>
-{% for candidate in candidates %}
-<div class="container"></div>
-<tr>
-    <td>
-        <input form="candidateToDelete" type="radio" name="candidateToDelete" value="{{candidate.id}}" />
-    </td>
-    <ul>
-        <li>{{candidate.id}}</li>
-        <li>{{candidate.name}}</li>
-        <li>{{candidate.email}}</li>
-    </ul>
-</tr>
+<div class="container">
+
+    <table style="width:100%">
+        <thead>
+            <tr>
+                <th style="text-align:right"></th>
+                <th style="text-align:right">ID</th>
+                <th style="text-align:right">Name</th>
+                <th style="text-align:right">Email</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                {% for candidate in candidates %}
+            <tr>
+                <br>
+                <td><input form="candidateToDelete" type="radio" name="candidateToDelete" value="{{candidate.id}}" />
+                </td>
+                <td style="text-align:right">{{candidate.id}}</td>
+                <br>
+                <td style="text-align:right">{{candidate.name}}</td>
+                <br>
+                <td style="text-align:right">{{candidate.email}}</td>
+            </tr>
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+</div>
 <br>
-<br>
-{% endfor %}
 <br>
 <form id="candidateToDelete" name="candidateToDelete" method="POST"
     action="{{ url_for('delete_candidate', candidateToDelete=candidateToDelete) }}">
