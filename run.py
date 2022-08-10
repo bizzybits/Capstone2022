@@ -527,16 +527,13 @@ def delete_candidate():
         candidateToDelete2 = int(candidateToDelete)
         print(f"candidatetodelete2 is {candidateToDelete2}")
         delete_me = CandidateModel.query.filter(CandidateModel.id==candidateToDelete).first()
-        # quiz_to_delete = QuizResults.query.filter(QuizResults.candidate_id==candidateToDelete2).first()
-        # print(f"quiz_to_delte is {quiz_to_delete}")
-        print(f"delete me is {delete_me}")
         if delete_me:
             db.session.delete(delete_me)
-            # db.session.delete(delete_me)
             db.session.commit()
             flash("You have deleted the selected Candidate.")
             return redirect("/employer")
         abort(404)
+        
    
 # UPDATE CANDIDATE 
 @app.route("/updateCandidate", methods=["GET","POST"])
